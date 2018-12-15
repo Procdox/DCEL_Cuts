@@ -18,6 +18,10 @@ _P Point::getPosition() const {
 	return position;
 }
 
+Edge * Point::getRoot() {
+	return root;
+}
+
 Edge const * Point::getRoot() const {
 	return root;
 }
@@ -28,6 +32,34 @@ Edge const * Point::getRoot() const {
 
 Edge::Edge(DCEL* uni) {
 	universe = uni;
+}
+
+Point * Edge::getStart() {
+	return root;
+}
+Point * Edge::getEnd() {
+	return inv->root;
+}
+
+Edge * Edge::getNext() {
+	return next;
+}
+Edge * Edge::getLast() {
+	return last;
+}
+Edge * Edge::getInv() {
+	return inv;
+}
+
+Face * Edge::getFace() {
+	return loop;
+}
+
+Edge * Edge::getCW() {
+	return last->inv;
+}
+Edge * Edge::getCCW() {
+	return inv->next;
 }
 
 Point const * Edge::getStart() const {
@@ -318,6 +350,10 @@ void Face::reFace() {
 	do {
 		focus->loop = this;
 	} while (focus != root);
+}
+
+Edge * Face::getRoot() {
+	return root;
 }
 
 Edge const * Face::getRoot() const {

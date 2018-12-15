@@ -31,6 +31,11 @@ public:
 	void setPosition(_P);
 	_P getPosition() const;
 
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	//         Traversal Methods
+
+	Edge * getRoot();
+
 	Edge const * getRoot() const;
 };
 
@@ -63,6 +68,20 @@ class Edge {
 public:
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	//         Traversal Methods
+
+	Point * getStart();
+	Point * getEnd();
+
+	Edge * getNext();
+	Edge * getLast();
+	Edge * getInv();
+
+	Face * getFace();
+
+	//get the next edge cw around the root
+	Edge * getCW();
+	//get the next edge ccw around the root
+	Edge * getCCW();
 
 	Point const * getStart() const;
 	Point const * getEnd() const;
@@ -145,6 +164,8 @@ class Face {
 public:
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	//         Traversal Methods
+
+	Edge * getRoot();
 
 	Edge const * getRoot() const;
 
