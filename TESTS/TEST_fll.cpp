@@ -25,6 +25,25 @@ TEST(FLL_Tests, push_and_pop) {
 	EXPECT_EQ(kk, 9);
 }
 
+TEST(FLL_Tests, append_and_pop) {
+	int list[] = { 4, 7, 2, 4, 7, 9, 0, 3, 1 };
+
+	FLL<int> test_object;
+
+	for (int kk = 0; kk < 9; ++kk) {
+		test_object.append(list[kk]);
+	}
+
+	int kk = 0;
+
+	do {
+		EXPECT_EQ(list[kk++], test_object.pop());
+
+	} while (!test_object.empty());
+
+	EXPECT_EQ(kk, 9);
+}
+
 TEST(FLL_Tests, push_and_iterate) {
 	int list[] = { 4, 7, 2, 4, 7, 9, 0, 3, 1 };
 
@@ -40,6 +59,28 @@ TEST(FLL_Tests, push_and_iterate) {
 	while(focus != nullptr){
 
 		EXPECT_EQ(list[8 - kk++], focus->getValue());
+
+		focus = focus->getNext();
+	}
+
+	EXPECT_EQ(kk, 9);
+}
+
+TEST(FLL_Tests, append_and_iterate) {
+	int list[] = { 4, 7, 2, 4, 7, 9, 0, 3, 1 };
+
+	FLL<int> test_object;
+
+	for (int kk = 0; kk < 9; ++kk) {
+		test_object.append(list[kk]);
+	}
+
+	auto focus = test_object.getHead();
+	int kk = 0;
+
+	while (focus != nullptr) {
+
+		EXPECT_EQ(list[kk++], focus->getValue());
 
 		focus = focus->getNext();
 	}

@@ -1,3 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="TEST_fll.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="TEST_point.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="TEST_types.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="TESTS.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="private">
+      <UniqueIdentifier>{2dbdb62e-5a36-4094-a300-49d5de2a3640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public">
+      <UniqueIdentifier>{dfd80d71-a83b-4865-a880-c57ff881a0f4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>public</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

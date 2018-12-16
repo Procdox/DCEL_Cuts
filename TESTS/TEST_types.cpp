@@ -51,17 +51,72 @@ TEST(DCEL_Basics, add_edge_pair) {
 
 TEST(DCEL_Basics, draw_area) {
 	DCEL space;
-
 	FLL<_P> boundary;
-	boundary.push(_P(0, 0));
-	boundary.push(_P(0, 20));
-	boundary.push(_P(20, 20));
-	boundary.push(_P(20, 0));
+	Face* test_object;
+	Edge* focus;
+	
+	boundary.append(_P(0, 0));
+	boundary.append(_P(0, 20));
+	boundary.append(_P(20, 20));
+	boundary.append(_P(20, 0));
 
-	Face* test_object = space.draw(boundary);
+	test_object = space.draw(boundary);
+
+	focus = test_object->getRoot();
+
+	EXPECT_EQ(focus->getStart()->getPosition(), _P(0, 0));
+	EXPECT_EQ(focus->getFace(), test_object);
+	EXPECT_NE(focus->getInv()->getFace(), test_object);
+
+	focus = focus->getNext();
+
+	EXPECT_EQ(focus->getStart()->getPosition(), _P(0, 20));
+	EXPECT_EQ(focus->getFace(), test_object);
+	EXPECT_NE(focus->getInv()->getFace(), test_object);
+
+	focus = focus->getNext();
+
+	EXPECT_EQ(focus->getStart()->getPosition(), _P(20, 20));
+	EXPECT_EQ(focus->getFace(), test_object);
+	EXPECT_NE(focus->getInv()->getFace(), test_object);
+
+	focus = focus->getNext();
+
+	EXPECT_EQ(focus->getStart()->getPosition(), _P(20, 0));
+	EXPECT_EQ(focus->getFace(), test_object);
+	EXPECT_NE(focus->getInv()->getFace(), test_object);
+
 
 	EXPECT_EQ(test_object->loopArea(), 400);
+	EXPECT_EQ(test_object->getRoot()->getInv()->getFace()->loopArea(), -400);
 }
+
+TEST(DCEL_Basics, append_draw) {
+	DCEL space;
+	FLL<_P> boundary;
+	Face* test_object;
+	Edge* focus;
+
+	boundary.append(_P(0, 0));
+	boundary.append(_P(0, 20));
+	boundary.append(_P(20, 20));
+	boundary.append(_P(20, 0));
+
+	test_object = space.draw(boundary);
+
+	focus = space.addEdge(test_object->getRoot()->getInv(), _P(-20, 0));
+	focus = space.addEdge(focus, _P(-20, 20));
+	focus = space.addEdge(focus, test_object->getRoot()->getInv()->getLast());
+
+
+	//test_object
+
+	EXPECT_EQ(test_object->loopArea(), 400);
+	EXPECT_EQ(focus->getFace()->loopArea(), 400);
+	EXPECT_EQ(focus->getInv()->getFace()->loopArea(), -800);
+}
+
+
 
 TEST(Edge_Tests, subdivide) {
 	DCEL space;
@@ -1196,6 +1251,10 @@ TEST(Face_Cuts, Divided_Point_Meet_Cut) {
 */
 
 // FACE MERGE
+TEST(FACE_Merge, two) {
+
+}
+
 /*
 TEST(Face_Merge, Hole_Absorbed) {
 	DCEL* space = new DCEL();
@@ -1226,6 +1285,7 @@ TEST(Face_Merge, Hole_Absorbed) {
 	EXPECT_EQ(exterior[0]->getHoleCount(), 0);
 	EXPECT_EQ(exterior[0]->getRootEdge()->loopArea(), 400);
 }
+
 TEST(Face_Merge, Interior_On_Hole) {
 	DCEL* space = new DCEL();
 

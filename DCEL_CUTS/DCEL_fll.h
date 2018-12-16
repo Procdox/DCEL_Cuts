@@ -55,6 +55,18 @@ public:
 
 		if (tail == nullptr) tail = head;
 	};
+
+	void append(_T value) {
+		if (head != nullptr) {
+			tail->next = new node<_T>(value, nullptr);
+			tail = tail->next;
+		}
+		else {
+			head = new node<_T>(value, nullptr);
+			tail = head;
+		}
+	}
+
 	//returns the element at head, undefined behavior if empty
 	_T pop() {
 		_T product = head->value;
@@ -68,6 +80,9 @@ public:
 
 		return product;
 	};
+
+	
+
 	bool empty() {
 		return head == nullptr;
 	}
@@ -95,6 +110,19 @@ public:
 	const node<_T>* getTail() const {
 		return tail;
 	};
+
+	FLL<_T> reverse() const {
+		FLL<_T> product;
+
+		node<_T>* focus = head;
+
+		while (focus != nullptr) {
+			product.push(focus->value);
+			focus = focus->next;
+		}
+
+		return product;
+	}
 
 	bool remove(_T search) {
 		node<_T>* focus = head;

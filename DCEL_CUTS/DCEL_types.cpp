@@ -531,7 +531,7 @@ double Face::loopArea() const {
 		A = B;
 		B = focus->inv->root->getPosition();
 
-		double width = A.X - B.X;
+		double width = B.X - A.X;
 		double avg_height = (A.Y + B.Y) / 2;
 
 		total += width * avg_height;
@@ -728,9 +728,12 @@ Face* DCEL::draw(FLL<_P> const &boundary) {
 
 	addEdge(strand, start->inv);
 
+	start->loop->root = start;
+
 	return start->loop;
 }
 
+//Sanity Check
 /*void DCEL::sanityCheck() {
 	for (auto edge : edges) {
 		check(edge->inverse_edge->inverse_edge == edge);
@@ -775,8 +778,10 @@ Face* DCEL::draw(FLL<_P> const &boundary) {
 			} while (focus != edge && max_loop > 0);
 		}
 	}
-}
+}*/
 
+
+/* subAllocateFace
 //culls a polygon to the region represented by this face, then culls from tjos face that region to create a set of new regions
 //interior regions are relevant to the proposed polygon
 //exterior are regions not relevant to the proposed, but members of this still
@@ -1340,8 +1345,31 @@ bool DCEL::Face::subAllocateFace(const TArray<_P> &border, TArray<Face*> &interi
 	}
 
 	return true;
-}
+}*/
 
+
+//mergeWithFace
+void Face::mergeWithFace(Face* target, FLL<Face*> &output) {
+	FLL<Edge*> markToRemove;
+
+	Edge * focus = root;
+	do {
+
+		if (focus->inv->loop == target) {
+			markToRemove.push(focus);
+		}
+
+		focus = focus->next;
+	} while (focus != root);
+
+	while (!markToRemove.empty()) {
+		Face* result = markToRemove.pop()->remove();
+		if(result != nullptr) output.push(result);
+	}
+
+	output.push(this);
+}
+/*
 //attempts to merge target faces to self by continuity across a shared edge section.
 bool DCEL::Face::mergeWithFace(Face* target) {
 	//cases

@@ -240,9 +240,10 @@ public:
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	//         Regioning
 
-	//bool subAllocateFace(const FLL<_P> &border, FLL<Face*> &interior_regions, FLL<Face*> &exterior_regions);
+	//takes in a simple region boundary and divides this face into faces interior to, and faces exterior to that boundary
+	void subAllocateFace(FLL<_P> const &boundary, FLL<Face*> &interiors, FLL<Face*> &exteriors);
 
-	//bool mergeWithFace(Face* target);
+	void mergeWithFace(Face*, FLL<Face*> &);
 
 	//void cleanBorder();
 };
@@ -284,6 +285,8 @@ public:
 	//creates an edge and its inverse connecting after an two edges
 	Edge* addEdge(Edge*, Edge*);
 
+	//creates a circular chain of edges forming a loop with the given boundary
+	//returns a pointer to the clock-wise oriented interior of the boundary
 	Face* draw(FLL<_P> const &boundary);
 
 	//void sanityCheck(); TODO
