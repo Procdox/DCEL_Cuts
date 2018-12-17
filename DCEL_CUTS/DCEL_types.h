@@ -39,6 +39,21 @@ public:
 	Edge const * getRoot() const;
 };
 
+enum EdgeModType { face_destroyed, faces_preserved, face_created};
+
+class EdgeModResult {
+	friend Edge;
+	//this can only be created by modifications
+	EdgeModResult(EdgeModType t, Face* f) {
+		type = t;
+		relevant = f;
+	}
+public:
+
+	EdgeModType type;
+	Face* relevant;
+};
+
 // Represents a one way connection between two points
 class Edge {
 	//friend Face;
@@ -106,36 +121,36 @@ public:
 	//detach from the current root point in favor of a novel point
 	//just moves root if it is isolated
 	//returns the face left at og root if it exists
-	Face* moveRoot(_P);
+	EdgeModResult moveRoot(_P);
 
 	//detaches from the current root and inserts to the end of target
 	//deletes og root if thereafter isolated
 	//returns the face left at og root if it exists
-	Face* insertAfter(Edge*);
+	EdgeModResult insertAfter(Edge*);
 
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	//         Removal
 
 	//remove this edge, its inverse, and either end points that are thereafter isolated
 	//returns novel face if created
-	Face* remove();
+	EdgeModResult remove();
 	//contracts this edge, the resulting point position is this edges root position
 	void contract();
 };
 
 //the relational types between a query point and a face
-enum faceRelationType { point_exterior, point_on_boundary, point_interior };
+enum FaceRelationType { point_exterior, point_on_boundary, point_interior };
 //represents the relation a query point has to a face
 //returned by getPointRelation
-class faceRelation {
+class FaceRelation {
 	friend Face;
 	//this can only be created by queris / copying 
-	faceRelation(faceRelationType t, Edge const * e) {
+	FaceRelation(FaceRelationType t, Edge const * e) {
 		type = t;
 		relevant = e;
 	}
 public:
-	faceRelationType type;
+	FaceRelationType type;
 	//if type is point_on_boundary, this is the edge that contains the point
 	//root inclusive, end exclusive
 	Edge const * relevant;
@@ -195,7 +210,7 @@ public:
 
 	//returns the relation of a point to a planar loop
 	//interior is defined by right-bound to edges, this means clockwise loops are inverted containment
-	faceRelation const getPointRelation(_P const &) const;
+	FaceRelation const getPointRelation(_P const &) const;
 
 	//returns the area of the loop
 	double loopArea() const;

@@ -1304,7 +1304,32 @@ TEST(Face_Cuts, Divided_Point_Meet_Cut) {
 // FACE MERGE
 
 TEST(FACE_Merge, append_merge) {
+	DCEL space;
+	FLL<_P> boundary;
+	FLL<Face*> results;
+	Face* test_object;
+	Face* partner;
+	Edge* focus;
 
+	boundary.append(_P(0, 0));
+	boundary.append(_P(0, 20));
+	boundary.append(_P(20, 20));
+	boundary.append(_P(20, 0));
+
+	test_object = space.draw(boundary);
+
+	focus = space.addEdge(test_object->getRoot()->getInv(), _P(-20, 0));
+	focus = space.addEdge(focus, _P(-20, 20));
+	focus = space.addEdge(focus, test_object->getRoot()->getInv()->getLast());
+
+	partner = focus->getFace();
+
+	test_object->mergeWithFace(partner, results);
+
+	EXPECT_EQ(test_object->loopArea(), 800);
+	EXPECT_EQ(focus->getInv()->getFace()->loopArea(), -800);
+
+	EXPECT_FALSE(results.empty());
 }
 TEST(FACE_Merge, entire_merge) {
 	DCEL space;
@@ -1323,6 +1348,8 @@ TEST(FACE_Merge, entire_merge) {
 	outside = test_object->getRoot()->getInv()->getFace();
 
 	test_object->mergeWithFace(outside, results);
+
+	EXPECT_TRUE(results.empty());
 }
 
 /*

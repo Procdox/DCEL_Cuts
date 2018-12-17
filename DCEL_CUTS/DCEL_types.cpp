@@ -158,13 +158,13 @@ void Edge::subdivide(_P mid_point) {
 	}
 }
 
-Face* Edge::moveRoot(_P p) {
+EdgeModResult Edge::moveRoot(_P p) {
 	Point* og = root;
 	if (last == inv) {
 		//root is isolated
 
 		root->setPosition(p);
-		return nullptr;
+		return EdgeModResult(EdgeModType::faces_preserved, nullptr);
 	}
 	else {
 		Point* end = universe->createPoint();
@@ -189,18 +189,20 @@ Face* Edge::moveRoot(_P p) {
 			Face* novel = universe->createFace();
 			novel->root = old;
 			novel->reFace();
+
+			return EdgeModResult(EdgeModType::face_created, novel);
 		}
 		else {
 			//we have merged two loops
 			universe->removeFace(inv->loop);
 			loop->reFace();
-		}
 
-		return old->loop;
+			return EdgeModResult(EdgeModType::face_destroyed, inv->loop);
+		}
 	}
 }
 
-Face* Edge::insertAfter(Edge* target) {
+EdgeModResult Edge::insertAfter(Edge* target) {
 	//remove from og
 
 	Face* novel_a = nullptr;
@@ -249,6 +251,8 @@ Face* Edge::insertAfter(Edge* target) {
 		novel_b = universe->createFace();
 		novel_b->root = inv;
 		novel_b->reFace();
+
+		return EdgeModResult(EdgeModType::face_created, novel_b);
 	}
 	else {
 		//we have joined two loops
@@ -260,34 +264,40 @@ Face* Edge::insertAfter(Edge* target) {
 
 		universe->removeFace(target->loop);
 		loop->reFace();
-	}
 
-	return novel_a;
+		return EdgeModResult(EdgeModType::face_destroyed, target->loop);
+	}
 }
 
-Face* Edge::remove() {
+EdgeModResult Edge::remove() {
 
 	//if either point is isolated, we dont need to reface
 	bool loose_strand = false;
+	bool isolated = true;
 	Face* novel = nullptr;
+	EdgeModResult product(EdgeModType::faces_preserved, nullptr);
 
 	if (next == inv) {
-		universe->removePoint(inv->root);
-
 		loose_strand = true;
+
+		universe->removePoint(inv->root);
 	}
 	else {
+		isolated = false;
+
 		inv->root->root = next;
 		next->last = inv->last;
 		inv->last->next = next;
 	}
 
 	if (last == inv) {
-		universe->removePoint(root);
-
 		loose_strand = true;
+
+		universe->removePoint(root);
 	}
 	else{
+		isolated = false;
+
 		root->root = inv->next;
 		last->next = inv->next;
 		inv->next->last = last;
@@ -304,17 +314,27 @@ Face* Edge::remove() {
 			novel->root = last;
 			novel->reFace();
 
+			product.type = EdgeModType::face_created;
+			product.relevant = novel;
+
 		}
 		else {
 			//we have merged two loops
 			loop->root = next;
 			universe->removeFace(inv->loop);
 			loop->reFace();
+
+			product.type = EdgeModType::face_destroyed;
+			product.relevant = inv->loop;
 		}
+	}
+	else if (isolated) {
+		product.type = EdgeModType::face_destroyed;
+		product.relevant = loop;
 	}
 
 	universe->removeEdge(this);
-	return novel;
+	return product;
 }
 
 void Edge::contract() {
@@ -449,7 +469,7 @@ void Face::getNeighbors(FLL<Face const *> &target) const {
 	} while (focus != root);
 }
 
-faceRelation const Face::getPointRelation(_P const &test_point) const {
+FaceRelation const Face::getPointRelation(_P const &test_point) const {
 	Edge const * focus = root;
 	int count = 0;
 
@@ -470,7 +490,7 @@ faceRelation const Face::getPointRelation(_P const &test_point) const {
 				if ((start_vector.X <= test_point.X && test_point.X <= end_vector.X) ||
 					(start_vector.X >= test_point.X && test_point.X >= end_vector.X)) {
 
-					return faceRelation(faceRelationType::point_on_boundary, focus);
+					return FaceRelation(FaceRelationType::point_on_boundary, focus);
 				}
 			}
 			focus = focus->next;
@@ -485,7 +505,7 @@ faceRelation const Face::getPointRelation(_P const &test_point) const {
 				int distance = test_point.X - x;
 
 				if (distance == 0) {
-					return faceRelation(faceRelationType::point_on_boundary, focus);
+					return FaceRelation(FaceRelationType::point_on_boundary, focus);
 				}
 				else if (distance > 0 && (distance < best_distance || !is_best)) {
 					is_best = true;
@@ -514,10 +534,10 @@ faceRelation const Face::getPointRelation(_P const &test_point) const {
 	} while (focus != root);
 
 	if (inside) {
-		return faceRelation(faceRelationType::point_interior, nullptr);
+		return FaceRelation(FaceRelationType::point_interior, nullptr);
 	}
 	else {
-		return faceRelation(faceRelationType::point_exterior, nullptr);
+		return FaceRelation(FaceRelationType::point_exterior, nullptr);
 	}
 }
 
@@ -1352,6 +1372,7 @@ bool DCEL::Face::subAllocateFace(const TArray<_P> &border, TArray<Face*> &interi
 //mergeWithFace
 void Face::mergeWithFace(Face* target, FLL<Face*> &output) {
 	FLL<Edge*> markToRemove;
+	FLL<Face*> product;
 
 	Edge * focus = root;
 	do {
@@ -1363,12 +1384,18 @@ void Face::mergeWithFace(Face* target, FLL<Face*> &output) {
 		focus = focus->next;
 	} while (focus != root);
 
-	while (!markToRemove.empty()) {
-		Face* result = markToRemove.pop()->remove();
-		if(result != nullptr) output.push(result);
-	}
+	product.push(this);
 
-	output.push(this);
+	while (!markToRemove.empty()) {
+		EdgeModResult result = markToRemove.pop()->remove();
+		if (result.type == EdgeModType::face_created) {
+			product.push(result.relevant);
+		}
+		else if (result.type == EdgeModType::face_destroyed) {
+			product.remove(result.relevant);
+		}
+	}
+	output.absorb(product);
 }
 /*
 //attempts to merge target faces to self by continuity across a shared edge section.
