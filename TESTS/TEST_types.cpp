@@ -17,6 +17,8 @@ TEST(DCEL_Basics, add_edge) {
 	EXPECT_EQ(inverse->getNext(), test_object);
 	EXPECT_EQ(inverse->getLast(), test_object);
 
+	EXPECT_EQ(inverse->getFace(), test_object->getFace());
+
 	EXPECT_EQ(test_object->getStart()->getPosition(), A);
 	EXPECT_EQ(test_object->getEnd()->getPosition(), B);
 }
@@ -45,8 +47,57 @@ TEST(DCEL_Basics, add_edge_pair) {
 	EXPECT_EQ(inv_B->getNext(), inv_A);
 	EXPECT_EQ(inv_B->getLast(), link_B);
 
+	EXPECT_EQ(link_A->getFace(), link_B->getFace());
+	EXPECT_EQ(inv_A->getFace(), inv_B->getFace());
+	EXPECT_EQ(link_B->getFace(), inv_B->getFace());
+
 	EXPECT_EQ(link_B->getStart()->getPosition(), B);
 	EXPECT_EQ(link_B->getEnd()->getPosition(), C);
+}
+
+TEST(DCEL_Basics, add_edge_chain) {
+	DCEL space;
+	_P A(0, 0);
+	_P B(10, 0);
+	_P C(10, 10);
+
+	Edge * link_A = space.addEdge(A, B);
+	Edge * link_B = space.addEdge(link_A, C);
+	Edge * link_C = space.addEdge(link_B, link_A->getInv());
+
+
+	Edge * inv_A = link_A->getInv();
+	Edge * inv_B = link_B->getInv();
+	Edge * inv_C = link_C->getInv();
+
+	EXPECT_EQ(link_A->getNext(), link_B);
+	EXPECT_EQ(link_A->getLast(), link_C);
+
+	EXPECT_EQ(link_B->getNext(), link_C);
+	EXPECT_EQ(link_B->getLast(), link_A);
+
+	EXPECT_EQ(link_C->getNext(), link_A);
+	EXPECT_EQ(link_C->getLast(), link_B);
+
+	EXPECT_EQ(inv_A->getNext(), inv_C);
+	EXPECT_EQ(inv_A->getLast(), inv_B);
+
+	EXPECT_EQ(inv_B->getNext(), inv_A);
+	EXPECT_EQ(inv_B->getLast(), inv_C);
+
+	EXPECT_EQ(inv_C->getNext(), inv_B);
+	EXPECT_EQ(inv_C->getLast(), inv_A);
+
+	EXPECT_NE(link_A->getFace(), inv_A->getFace());
+
+	EXPECT_EQ(link_A->getFace(), link_B->getFace());
+	EXPECT_EQ(link_A->getFace(), link_C->getFace());
+	
+	EXPECT_EQ(inv_A->getFace(), inv_B->getFace());
+	EXPECT_EQ(inv_A->getFace(), inv_C->getFace());
+
+	EXPECT_EQ(link_C->getStart()->getPosition(), C);
+	EXPECT_EQ(link_C->getEnd()->getPosition(), A);
 }
 
 TEST(DCEL_Basics, draw_area) {
@@ -1251,8 +1302,27 @@ TEST(Face_Cuts, Divided_Point_Meet_Cut) {
 */
 
 // FACE MERGE
-TEST(FACE_Merge, two) {
 
+TEST(FACE_Merge, append_merge) {
+
+}
+TEST(FACE_Merge, entire_merge) {
+	DCEL space;
+	FLL<_P> boundary;
+	FLL<Face*> results;
+	Face* test_object;
+	Face* outside;
+
+	boundary.append(_P(0, 0));
+	boundary.append(_P(0, 20));
+	boundary.append(_P(20, 20));
+	boundary.append(_P(20, 0));
+
+	test_object = space.draw(boundary);
+
+	outside = test_object->getRoot()->getInv()->getFace();
+
+	test_object->mergeWithFace(outside, results);
 }
 
 /*

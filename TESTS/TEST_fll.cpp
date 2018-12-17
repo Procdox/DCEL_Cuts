@@ -199,3 +199,89 @@ TEST(FLL_Tests, remove_all) {
 
 	EXPECT_EQ(kk, 7);
 }
+
+TEST(FLL_Tests, absorb_empty) {
+	int list_a[] = { 4, 7, 2, 4 };
+	int result[] = { 4, 7, 2, 4 };
+
+	FLL<int> object_a;
+	FLL<int> object_b;
+
+	for (int kk = 0; kk < 4; ++kk) {
+		object_a.append(list_a[kk]);
+	}
+
+	object_a.absorb(object_b);
+
+	auto focus = object_a.getHead();
+	int kk = 0;
+
+	while (focus != nullptr) {
+
+		EXPECT_EQ(result[kk++], focus->getValue());
+
+		focus = focus->getNext();
+	}
+
+	EXPECT_EQ(kk, 4);
+	EXPECT_TRUE(object_b.empty());
+}
+
+TEST(FLL_Tests, absorb_to_empty) {
+	int list_b[] = { 3, 1, 6, 9 };
+	int result[] = { 3, 1, 6, 9 };
+
+	FLL<int> object_a;
+	FLL<int> object_b;
+
+	for (int kk = 0; kk < 4; ++kk) {
+		object_b.append(list_b[kk]);
+	}
+
+	object_a.absorb(object_b);
+
+	auto focus = object_a.getHead();
+	int kk = 0;
+
+	while (focus != nullptr) {
+
+		EXPECT_EQ(result[kk++], focus->getValue());
+
+		focus = focus->getNext();
+	}
+
+	EXPECT_EQ(kk, 4);
+	EXPECT_TRUE(object_b.empty());
+}
+
+
+TEST(FLL_Tests, absorb) {
+	int list_a[] = { 4, 7, 2, 4 };
+	int list_b[] = { 3, 1, 6, 9 };
+	int result[] = { 4, 7, 2, 4, 3, 1, 6, 9 };
+
+	FLL<int> object_a;
+	FLL<int> object_b;
+
+	for (int kk = 0; kk < 4; ++kk) {
+		object_a.append(list_a[kk]);
+	}
+	for (int kk = 0; kk < 4; ++kk) {
+		object_b.append(list_b[kk]);
+	}
+
+	object_a.absorb(object_b);
+
+	auto focus = object_a.getHead();
+	int kk = 0;
+
+	while (focus != nullptr) {
+
+		EXPECT_EQ(result[kk++], focus->getValue());
+
+		focus = focus->getNext();
+	}
+
+	EXPECT_EQ(kk, 8);
+	EXPECT_TRUE(object_b.empty());
+}

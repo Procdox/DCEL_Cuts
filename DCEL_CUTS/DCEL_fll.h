@@ -206,4 +206,21 @@ public:
 
 		return count;
 	};
+
+	//appends the target list, and empties it
+	void absorb(FLL<_T> &target) {
+		if (target.head != nullptr) {
+
+			if (head == nullptr) {
+				head = target.head;
+			}
+			else {
+				tail->next = target.head;
+			}
+
+			tail = target.tail;
+
+			target.head = nullptr;
+		}
+	}
 };

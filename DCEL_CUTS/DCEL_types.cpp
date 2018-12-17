@@ -349,6 +349,7 @@ void Face::reFace() {
 	Edge* focus = root;
 	do {
 		focus->loop = this;
+		focus = focus->next;
 	} while (focus != root);
 }
 
