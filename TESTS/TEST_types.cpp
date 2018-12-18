@@ -1352,6 +1352,35 @@ TEST(FACE_Merge, entire_merge) {
 	EXPECT_TRUE(results.empty());
 }
 
+TEST(FACE_Merge, merge_gap) {
+	DCEL space;
+	FLL<_P> boundary;
+	FLL<Face*> results;
+	Face* test_object;
+	Face* outside;
+	Edge* focus;
+
+	boundary.append(_P(0, 0));
+	boundary.append(_P(0, 5));
+	boundary.append(_P(5, 10));
+	boundary.append(_P(0, 15));
+	boundary.append(_P(0, 20));
+	boundary.append(_P(10, 10));
+
+	test_object = space.draw(boundary);
+
+
+	focus = space.addEdge(test_object->getRoot()->getInv(), _P(-10, 10));
+	space.addEdge(focus, test_object->getRoot()->getNext()->getNext()->getNext()->getNext()->getInv());
+	space.addEdge(test_object->getRoot()->getNext()->getInv(), test_object->getRoot()->getNext()->getNext()->getNext()->getInv());
+
+	outside = test_object->getRoot()->getInv()->getFace();
+
+	test_object->mergeWithFace(outside, results);
+
+	EXPECT_EQ(results.size(), 2);
+}
+
 /*
 TEST(Face_Merge, Hole_Absorbed) {
 	DCEL* space = new DCEL();

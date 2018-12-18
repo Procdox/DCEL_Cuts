@@ -223,4 +223,16 @@ public:
 			target.head = nullptr;
 		}
 	}
+
+	int size() const {
+		node<_T>* focus = head;
+		int s = 0;
+		
+		while (focus != nullptr) {
+			s++;
+			focus = focus->next;
+		}
+
+		return s;
+	}
 };

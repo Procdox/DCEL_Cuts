@@ -254,6 +254,15 @@ TEST(FLL_Tests, absorb_to_empty) {
 	EXPECT_TRUE(object_b.empty());
 }
 
+TEST(FLL_Tests, absorb_empty_to_empty) {
+	FLL<int> object_a;
+	FLL<int> object_b;
+
+	object_a.absorb(object_b);
+
+	EXPECT_TRUE(object_a.empty());
+	EXPECT_TRUE(object_b.empty());
+}
 
 TEST(FLL_Tests, absorb) {
 	int list_a[] = { 4, 7, 2, 4 };
@@ -284,4 +293,20 @@ TEST(FLL_Tests, absorb) {
 
 	EXPECT_EQ(kk, 8);
 	EXPECT_TRUE(object_b.empty());
+}
+
+TEST(FLL_Tests, append_and_size) {
+	FLL<int> test_object;
+
+	test_object.append(4);
+	test_object.append(2);
+	test_object.append(7);
+
+	EXPECT_EQ(test_object.size(), 3);
+}
+
+TEST(FLL_Tests, empty_and_size) {
+	FLL<int> test_object;
+
+	EXPECT_EQ(test_object.size(), 0);
 }
