@@ -8,4 +8,6 @@ Simply put, you can divide space into irregular polygons as you like.
 
 # Testing
 
-Test cases are supplied, gtest is not.
+Test cases are supplied in a dependent project.
+gTest is supplied as a submodule and linked to.
+gTest must be manually compiled. This can be done by opening \DCEL_Cuts\googletest\googletest\msvc\2010\gtest.sln and compiling the gtest project. No other gtest projects are needed.
