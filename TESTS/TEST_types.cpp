@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "..\DCEL_CUTS\DCEL_types.h"
-#include "gtest\gtest.h"
 
 TEST(DCEL_Basics, add_edge) {
 	DCEL space;

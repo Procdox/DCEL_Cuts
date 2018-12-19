@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "..\DCEL_CUTS\DCEL_point.h"
-#include "gtest\gtest.h"
 
 TEST(Point_Tests, on_segment) {
 	_P p(-200, 300);

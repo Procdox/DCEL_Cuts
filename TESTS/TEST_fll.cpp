@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "..\DCEL_CUTS\DCEL_fll.h"
-#include "gtest\gtest.h"
 
 TEST(FLL_Tests, construction) {
 	FLL<int> test_object;
