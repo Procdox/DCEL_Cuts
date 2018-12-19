@@ -1,5 +1,11 @@
 #pragma once
 
+/*
+
+Contains definition for a forward linked list template
+
+*/
+
 template <class _T>
 class FLL;
 

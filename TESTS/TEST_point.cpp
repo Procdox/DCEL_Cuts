@@ -2,9 +2,9 @@
 #include "..\DCEL_CUTS\DCEL_point.h"
 
 TEST(Point_Tests, on_segment) {
-	_P p(-200, 300);
-	_P a(-300, 400);
-	_P b(100, 0);
+	Pint p(-200, 300);
+	Pint a(-300, 400);
+	Pint b(100, 0);
 
-	EXPECT_TRUE(_P::isOnSegment(p, a, b));
+	EXPECT_TRUE(Pint::isOnSegment(p, a, b));
 }

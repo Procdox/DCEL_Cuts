@@ -151,11 +151,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DCEL_fll.h" />
+    <ClInclude Include="DCEL_Region.h" />
     <ClInclude Include="DCEL_types.h" />
     <ClInclude Include="DCEL_point.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DCEL_types.cpp" />
+    <ClCompile Include="DCEL_Region.cpp" />
     <ClCompile Include="DCEL_point.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

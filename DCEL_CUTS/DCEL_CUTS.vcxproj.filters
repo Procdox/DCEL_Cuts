@@ -4,7 +4,7 @@
     <ClCompile Include="DCEL_point.cpp">
       <Filter>private</Filter>
     </ClCompile>
-    <ClCompile Include="DCEL_types.cpp">
+    <ClCompile Include="DCEL_Region.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>
@@ -16,6 +16,9 @@
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="DCEL_types.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="DCEL_Region.h">
       <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>

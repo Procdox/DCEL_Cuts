@@ -1,6 +1,4 @@
-// DCEL.cpp : Defines the exported functions for the DLL application.
-//
-#include "DCEL_point.h"
+#include "DCEL_Point.h"
 
 int gcd(int a, int b) {
 	if (a == 0)
@@ -8,66 +6,66 @@ int gcd(int a, int b) {
 	return gcd(b % a, a);
 }
 
-_P::_P() {
+Pint::Pint() {
 	X = 0;
 	Y = 0;
 }
-_P::_P(int x, int y) {
+Pint::Pint(int x, int y) {
 	X = x;
 	Y = y;
 }
 
-_P _P::operator+(const _P &add) const {
-	return _P(X + add.X, Y + add.Y);
+Pint Pint::operator+(const Pint &add) const {
+	return Pint(X + add.X, Y + add.Y);
 }
-_P _P::operator-(const _P &sub) const {
-	return _P(X - sub.X, Y - sub.Y);
+Pint Pint::operator-(const Pint &sub) const {
+	return Pint(X - sub.X, Y - sub.Y);
 }
-_P _P::operator*(int mul) const {
-	return _P(X * mul, Y * mul);
+Pint Pint::operator*(int mul) const {
+	return Pint(X * mul, Y * mul);
 }
-_P _P::operator*(const _P &mul) const {
-	return _P(X * mul.X, Y * mul.Y);
+Pint Pint::operator*(const Pint &mul) const {
+	return Pint(X * mul.X, Y * mul.Y);
 }
-_P _P::operator/(int div) const {
+Pint Pint::operator/(int div) const {
 	//check(X % div == 0);
 	//check(Y % div == 0);
-	return _P(X / div, Y / div);
+	return Pint(X / div, Y / div);
 }
-_P _P::operator/(const _P &div) const {
+Pint Pint::operator/(const Pint &div) const {
 	//check(X % div.X == 0);
 	//check(Y % div.Y == 0);
-	return _P(X / div.X, Y / div.Y);
+	return Pint(X / div.X, Y / div.Y);
 }
 
-_P& _P::operator+=(const _P &add) {
+Pint& Pint::operator+=(const Pint &add) {
 	X += add.X;
 	Y += add.Y;
 	return *this;
 }
-_P& _P::operator-=(const _P &sub) {
+Pint& Pint::operator-=(const Pint &sub) {
 	X -= sub.X;
 	Y -= sub.Y;
 	return *this;
 }
-_P& _P::operator*=(float mul) {
+Pint& Pint::operator*=(float mul) {
 	X *= mul;
 	Y *= mul;
 	return *this;
 }
-_P& _P::operator*=(const _P &mul) {
+Pint& Pint::operator*=(const Pint &mul) {
 	X *= mul.X;
 	Y *= mul.Y;
 	return *this;
 }
-_P& _P::operator/=(int div) {
+Pint& Pint::operator/=(int div) {
 	//check(X % div == 0);
 	//check(Y % div == 0);
 	X /= div;
 	Y /= div;
 	return *this;
 }
-_P& _P::operator/=(const _P &div) {
+Pint& Pint::operator/=(const Pint &div) {
 	//check(X % div.X == 0);
 	//check(Y % div.Y == 0);
 	X /= div.X;
@@ -75,16 +73,16 @@ _P& _P::operator/=(const _P &div) {
 	return *this;
 }
 
-bool _P::operator==(const _P &test) const {
+bool Pint::operator==(const Pint &test) const {
 	return test.X == X && test.Y == Y;
 }
-bool _P::operator!=(const _P &test) const {
+bool Pint::operator!=(const Pint &test) const {
 	return test.X != X || test.Y != Y;
 }
-int _P::SizeSquared() const {
+int Pint::SizeSquared() const {
 	return X * X + Y * Y;
 }
-float _P::Size() const {
+float Pint::Size() const {
 	//return FMath::Sqrt(SizeSquared()); //MARK FLOAT USED
 	return 0;
 }
@@ -98,11 +96,11 @@ float _P::Size() const {
 //	Y /= size;
 //}
 
-int _P::Dot(const _P &b) const {
+int Pint::Dot(const Pint &b) const {
 	return X * b.X + Y * b.Y;
 }
 
-point_near_segment_state _P::getState(const _P &start, const _P &end) const {
+point_near_segment_state Pint::getState(const Pint &start, const Pint &end) const {
 	if (*this == start) {
 		return on_start;
 	}
@@ -129,17 +127,17 @@ point_near_segment_state _P::getState(const _P &start, const _P &end) const {
 	return on_segment;
 }
 
-_P _P::decompose(int &factor) {
+Pint Pint::decompose(int &factor) {
 	//we need to find every common factor of x and y and remove it
 	factor = gcd(this->X, this->Y);
-	_P product = *this;
+	Pint product = *this;
 	product /= (factor);
 	return product;
 }
 
-bool _P::areParrallel(const _P &A_S, const _P &A_E, const _P &B_S, const _P &B_E) {
-	const _P A = A_E - A_S;
-	const _P A_R = A + B_S;
+bool Pint::areParrallel(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E) {
+	const Pint A = A_E - A_S;
+	const Pint A_R = A + B_S;
 
 	//if A lies on B or after it they are parrallel
 	auto state = A_R.getState(B_S, B_E);
@@ -147,16 +145,16 @@ bool _P::areParrallel(const _P &A_S, const _P &A_E, const _P &B_S, const _P &B_E
 
 }
 
-bool _P::isOnSegment(const _P &test, const _P &a, const _P &b) {
+bool Pint::isOnSegment(const Pint &test, const Pint &a, const Pint &b) {
 	auto state = test.getState(a, b);
 	return (state == on_segment || state == on_start);
 }
 
-bool _P::inRegionCW(const _P &test, const _P &before, const _P &corner, const _P &after) {
+bool Pint::inRegionCW(const Pint &test, const Pint &before, const Pint &corner, const Pint &after) {
 	return (test.getState(before, corner) == right_of_segment && test.getState(corner, after) == right_of_segment);
 }
 
-int _P::getIntersect(const _P &A_S, const _P &A_E, const _P &B_S, const _P &B_E, _P &Result) {
+int Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E, Pint &Result) {
 	const auto A = A_E - A_S;
 	const auto B = B_E - B_S;
 

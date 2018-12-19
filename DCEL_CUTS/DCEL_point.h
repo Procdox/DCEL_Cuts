@@ -1,82 +1,39 @@
 #pragma once
-
 #include "DCEL_fll.h"
+
+/*
+
+Contains defintion for an integer bound 2d vector.
+DCEL_types operate independent of spacial representation. You may substitute your own depending on your needs.
+DCEL_region requires this representation as currently.
+
+*/
 
 enum point_near_segment_state { left_of_segment, right_of_segment, before_segment, after_segment, on_start, on_end, on_segment };
 
-/*int gcd(int a, int b) {
-	if (a == 0)
-		return b;
-	return gcd(b % a, a);
-}
-
-class Rational {
-	friend Rational_Set;
-	int value;
-public:
-	Rational(Rational_Set* f, int n, int d = 1) {
-		f->consider(this, d);
-	}
-	asFloat()
-};
-
-
-class Rational_Set {
-	int scale;
-	FLL<Rational> members;
-
-public:
-	void consider(Rational* pledge, int d) {
-		members.Push(pledge);
-		pledge->value *= scale;
-
-		int divisor = gcd(d, scale);
-		int parts = d / divisor;
-		if (parts > 1) {
-			scale *= parts;
-			//UPDATE
-		}
-	}
-	int get() {
-		return scale;
-	}
-};
-
-class Rational {
-	Rational_Set* field;
-	int value;
-public:
-	Rational(Rational_Set* f, int n, int d = 1) {
-		field = f;
-		field->consider(d);
-		value = n * field->get();
-	}
-	asFloat()
-};*/
-
-struct _P {
+struct Pint {
 	int X;
 	int Y;
 
-	_P();
-	_P(int x, int y);
+	Pint();
+	Pint(int x, int y);
 
-	_P operator+(const _P &add) const;
-	_P operator-(const _P &sub) const;
-	_P operator*(int mul) const;
-	_P operator*(const _P &mul) const;
-	_P operator/(int div) const;
-	_P operator/(const _P &div) const;
+	Pint operator+(const Pint &add) const;
+	Pint operator-(const Pint &sub) const;
+	Pint operator*(int mul) const;
+	Pint operator*(const Pint &mul) const;
+	Pint operator/(int div) const;
+	Pint operator/(const Pint &div) const;
 
-	_P& operator+=(const _P &add);
-	_P& operator-=(const _P &sub);
-	_P& operator*=(float mul);
-	_P& operator*=(const _P &mul);
-	_P& operator/=(int div);
-	_P& operator/=(const _P &div);
+	Pint& operator+=(const Pint &add);
+	Pint& operator-=(const Pint &sub);
+	Pint& operator*=(float mul);
+	Pint& operator*=(const Pint &mul);
+	Pint& operator/=(int div);
+	Pint& operator/=(const Pint &div);
 
-	bool operator==(const _P &test) const;
-	bool operator!=(const _P &test) const;
+	bool operator==(const Pint &test) const;
+	bool operator!=(const Pint &test) const;
 	int SizeSquared() const;
 	float Size() const;
 	//void Normalize() {
@@ -89,30 +46,30 @@ struct _P {
 	//	Y /= size;
 	//}
 
-	int Dot(const _P &b) const;
+	int Dot(const Pint &b) const;
 
-	point_near_segment_state getState(const _P &start, const _P &end) const;
+	point_near_segment_state getState(const Pint &start, const Pint &end) const;
 
-	_P decompose(int &factor);
+	Pint decompose(int &factor);
 
-	static bool areParrallel(const _P &A_S, const _P &A_E, const _P &B_S, const _P &B_E);
+	static bool areParrallel(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E);
 
-	static bool isOnSegment(const _P &test, const _P &a, const _P &b);
+	static bool isOnSegment(const Pint &test, const Pint &a, const Pint &b);
 
-	static bool inRegionCW(const _P &test, const _P &before, const _P &corner, const _P &after);
+	static bool inRegionCW(const Pint &test, const Pint &before, const Pint &corner, const Pint &after);
 
-	static int getIntersect(const _P &A_S, const _P &A_E, const _P &B_S, const _P &B_E, _P &Result);
+	static int getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E, Pint &Result);
 
 };
 
 struct PBox {
-	_P Min;
-	_P Max;
+	Pint Min;
+	Pint Max;
 
-	_P getExtent() {
+	Pint getExtent() {
 		return (Max - Min) / 2;
 	}
-	_P getCenter() {
+	Pint getCenter() {
 		return (Max + Min) / 2;
 	}
 };
