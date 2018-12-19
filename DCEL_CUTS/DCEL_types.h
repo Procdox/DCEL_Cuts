@@ -450,25 +450,6 @@ public:
 
 };
 
-//the relational types between a query point and a face
-enum FaceRelationType { point_exterior, point_on_boundary, point_interior };
-//represents the relation a query point has to a face
-//returned by getPointRelation
-template <class _P>
-class FaceRelation {
-	friend Face<_P>;
-	//this can only be created by queris / copying 
-	FaceRelation(FaceRelationType t, Edge<_P> const * e) {
-		type = t;
-		relevant = e;
-	}
-public:
-	FaceRelationType type;
-	//if type is point_on_boundary, this is the edge that contains the point
-	//root inclusive, end exclusive
-	Edge<_P> const * relevant;
-};
-
 //represents a loop formed by a series of edges
 template <class _P>
 class Face {
