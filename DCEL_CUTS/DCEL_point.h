@@ -60,6 +60,8 @@ struct Pint {
 
 	static int getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E, Pint &Result);
 
+	static double area(FLL<Pint> const &boundary);
+
 };
 
 struct PBox {

@@ -13,13 +13,29 @@ clockwise boundaries contained within the clockwise boundary.
 
 */
 
+//the relational types between a query point and a face
+enum FaceRelationType { point_exterior, point_on_boundary, point_interior };
+//represents the relation a query point has to a face
+//returned by getPointRelation
+class FaceRelation {
+	friend Face<Pint>;
+	//this can only be created by queris / copying 
+	FaceRelation(FaceRelationType t, Edge<Pint> const * e) {
+		type = t;
+		relevant = e;
+	}
+public:
+	FaceRelationType type;
+	//if type is point_on_boundary, this is the edge that contains the point
+	//root inclusive, end exclusive
+	Edge<Pint> const * relevant;
+};
+
 class Region {
 	FLL<Face<Pint> *> Boundaries;
 
 	//if non-trivially connected, will absorb the target region into this one via face merging
 	void merge(Region*);
-
-	double area();
 
 	//restricts a region to another, returns a list of regions inside and outside the restricted region.
 	friend void allocate_from(Region*, Region*, FLL<Region*>, FLL<Region*>);

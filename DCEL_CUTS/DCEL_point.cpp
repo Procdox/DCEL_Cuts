@@ -86,6 +86,7 @@ float Pint::Size() const {
 	//return FMath::Sqrt(SizeSquared()); //MARK FLOAT USED
 	return 0;
 }
+
 //void Normalize() {
 //	const int sizeSq = SizeSquared();
 //	const int sizeSq = SizeSquared();
@@ -183,4 +184,41 @@ int Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const 
 	}
 
 	return -1;
+}
+
+double Pint::area(FLL<Pint> const &boundary) {
+	auto focus = boundary.getHead();
+
+	if (focus == nullptr) {
+		return 0;
+	}
+
+	auto next = focus->getNext();
+
+	if (next == nullptr) {
+		return 0;
+	}
+
+	double total;
+
+	do {
+		Pint A = focus->getValue();
+		Pint B = next->getValue();
+
+		double width = B.X - A.X;
+		double avg_height = (A.Y + B.Y) / 2;
+
+		total += width * avg_height;
+
+		focus = next;
+		next = next->getNext();
+	} while (next != nullptr);
+
+	Pint A = focus->getValue();
+	Pint B = boundary.getHead()->getValue();
+
+	double width = B.X - A.X;
+	double avg_height = (A.Y + B.Y) / 2;
+
+	return total;
 }

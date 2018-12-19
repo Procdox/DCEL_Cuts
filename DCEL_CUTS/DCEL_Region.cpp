@@ -1,29 +1,19 @@
 #include "DCEL_Region.h"
 
-/*
-double Face::loopArea() const {
-Edge const * focus = root;
-double total = 0;
+void Region::merge(Region * target) {
+	//since both areas are continuous, its trivial that only one or no boundary pair can touch
 
-_P A;
-_P B = focus->root->getPosition();
+	auto focus_local = Boundaries.getHead();
+	while (focus_local != nullptr) {
+		auto focus_target = target->Boundaries.getHead();
+		while (focus_target != nullptr) {
+			//if they both contain each other, they can't possibly touch
+			//if they are external to each other they might touch
+			//if touching... I'll leave that to you
 
-do {
-A = B;
-B = focus->inv->root->getPosition();
-
-double width = B.X - A.X;
-double avg_height = (A.Y + B.Y) / 2;
-
-total += width * avg_height;
-
-focus = focus->next;
-
-} while (focus != root);
-
-return total;
-}
-*/
+			if(focus_target->getValue()->)
+		}
+	}
 
 /*
 template <class _P>
