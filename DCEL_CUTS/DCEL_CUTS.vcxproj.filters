@@ -7,9 +7,6 @@
     <ClCompile Include="DCEL_types.cpp">
       <Filter>private</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>private</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DCEL_fll.h">
@@ -22,9 +19,6 @@
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
       <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>

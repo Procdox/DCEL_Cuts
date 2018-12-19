@@ -1,6 +1,5 @@
 // DCEL.cpp : Defines the exported functions for the DLL application.
 //
-#include "stdafx.h"
 #include "DCEL_point.h"
 
 int gcd(int a, int b) {
