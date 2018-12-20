@@ -199,7 +199,7 @@ double Pint::area(FLL<Pint> const &boundary) {
 		return 0;
 	}
 
-	double total;
+	double total = 0;
 
 	do {
 		Pint A = focus->getValue();

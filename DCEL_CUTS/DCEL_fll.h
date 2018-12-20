@@ -52,8 +52,32 @@ public:
 		tail = nullptr;
 	};
 	~FLL() {
+		clear();
+	};
+	FLL(FLL<_T> const &reference) {
+		node<_T> * focus = reference.head;
 		head = nullptr;
 		tail = nullptr;
+
+		while (focus != nullptr) {
+			push(focus->value);
+
+			focus = focus->next;
+		}
+	};
+
+	FLL<_T> & operator=(FLL<_T> const &reference) {
+		node<_T> * focus = reference.head;
+		head = nullptr;
+		tail = nullptr;
+
+		while (focus != nullptr) {
+			push(focus->value);
+
+			focus = focus->next;
+		}
+
+		return *this;
 	};
 
 	void push(_T value) {
@@ -241,4 +265,16 @@ public:
 
 		return s;
 	}
+
+	void clear() {
+		auto focus = head;
+
+		while (head != nullptr) {
+			focus = head->next;
+			delete head;
+			head = focus;
+		}
+
+		tail = nullptr;
+	};
 };

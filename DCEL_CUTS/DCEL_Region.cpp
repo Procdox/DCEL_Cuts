@@ -1,94 +1,149 @@
 #include "DCEL_Region.h"
 
-void Region::merge(Region * target) {
-	//since both areas are continuous, its trivial that only one or no boundary pair can touch
+FaceRelation const getPointRelation(Face<Pint> const &rel, Pint const &test_point) {
+	Edge<Pint> const * focus = rel.getRoot();
+	int count = 0;
 
-	auto focus_local = Boundaries.getHead();
-	while (focus_local != nullptr) {
-		auto focus_target = target->Boundaries.getHead();
-		while (focus_target != nullptr) {
-			//if they both contain each other, they can't possibly touch
-			//if they are external to each other they might touch
-			//if touching... I'll leave that to you
+	bool is_best = false;
+	float best_distance = 0;
+	bool inside = false;
 
-			if(focus_target->getValue()->)
+	do {
+		const Pint &start_vector = focus->getStart()->getPosition();
+		const Pint &end_vector = focus->getEnd()->getPosition();
+
+		//does it sit on
+		int y_length = end_vector.Y - start_vector.Y;
+		int y_offset = test_point.Y - start_vector.Y;
+
+		if (y_length == 0) {
+			if (y_offset == 0) {
+				if ((start_vector.X <= test_point.X && test_point.X <= end_vector.X) ||
+					(start_vector.X >= test_point.X && test_point.X >= end_vector.X)) {
+
+					return FaceRelation(FaceRelationType::point_on_boundary, focus);
+				}
+			}
+			focus = focus->getNext();
+			continue;
 		}
+		else if ((y_offset <= y_length && y_offset >= 0) || y_offset >= y_length && y_offset <= 0) {
+			int x_length = end_vector.X - start_vector.X;
+
+			if ((x_length * y_offset) % y_length == 0) {
+				//robust solution!
+				int x = start_vector.X + (x_length * y_offset) / y_length;
+				int distance = test_point.X - x;
+
+				if (distance == 0) {
+					return FaceRelation(FaceRelationType::point_on_boundary, focus);
+				}
+				else if (distance > 0 && (distance < best_distance || !is_best)) {
+					is_best = true;
+					best_distance = distance;
+
+					inside = y_length > 0;
+				}
+				else {
+				}
+			}
+			else {
+				//floats, oh no!
+				float x = (float)start_vector.X + (float)(x_length * y_offset) / (float)y_length;
+				float distance = test_point.X - x;
+				if (distance < 0) distance *= -1;
+
+				if (distance > 0.f && (distance < best_distance || !is_best)) {
+					is_best = true;
+					best_distance = distance;
+
+					inside = y_length > 0;
+				}
+			}
+		}
+		focus = focus->getNext();
+	} while (focus != rel.getRoot());
+
+	if (inside) {
+		return FaceRelation(FaceRelationType::point_interior, nullptr);
+	}
+	else {
+		return FaceRelation(FaceRelationType::point_exterior, nullptr);
+	}
+}
+
+FaceRelation Region::contains(Pint const &test_point) {
+	auto focus = Boundaries.getHead();
+	while (focus != nullptr) {
+
+		FaceRelation result = getPointRelation(*focus->getValue(), test_point);
+		if (result.type != FaceRelationType::point_interior) {
+			return result;
+		}
+
+		focus = focus->getNext();
 	}
 
-/*
-template <class _P>
-FaceRelation<_P> const Face<_P>::getPointRelation(_P const &test_point) const {
-Edge<_P> const * focus = root;
-int count = 0;
+	return FaceRelation(FaceRelationType::point_interior, nullptr);
+}
 
-bool is_best = false;
-float best_distance = 0;
-bool inside = false;
+bool Region::merge(Region * target) {
+	//since both areas are continuous, its trivial that only one or no boundary pair can touch
+	
+	//regions are either strictly internal, strictly external, or weakly external to boundaries
 
-do {
-const _P &start_vector = focus->root->getPosition();
-const _P &end_vector = focus->inv->root->getPosition();
+	//if a boundary contains any part of a region, it can't touch that region (
+	//valve timing control solenoid 348
+	//fluids 145, 79, 99
+	//differential 109
+	//oil change 45
+	//oil leak 295 
+	//spark plugs 170
 
-//does it sit on
-int y_length = end_vector.Y - start_vector.Y;
-int y_offset = test_point.Y - start_vector.Y;
+	auto focus_local = Boundaries.getHead();
+	auto focus_target  = target->Boundaries.getHead();
+	
 
-if (y_length == 0) {
-if (y_offset == 0) {
-if ((start_vector.X <= test_point.X && test_point.X <= end_vector.X) ||
-(start_vector.X >= test_point.X && test_point.X >= end_vector.X)) {
+	while (focus_local != nullptr) {
+		focus_target = target->Boundaries.getHead();
+		auto neighbors = focus_local->getValue()->getNeighbors();
 
-return FaceRelation(FaceRelationType::point_on_boundary, focus);
-}
-}
-focus = focus->next;
-continue;
-}
-else if ((y_offset <= y_length && y_offset >= 0) || y_offset >= y_length && y_offset <= 0) {
-int x_length = end_vector.X - start_vector.X;
+		while (focus_target != nullptr) {
 
-if ((x_length * y_offset) % y_length == 0) {
-//robust solution!
-int x = start_vector.X + (x_length * y_offset) / y_length;
-int distance = test_point.X - x;
+			if (neighbors.contains(focus_target->getValue())) {
 
-if (distance == 0) {
-return FaceRelation(FaceRelationType::point_on_boundary, focus);
-}
-else if (distance > 0 && (distance < best_distance || !is_best)) {
-is_best = true;
-best_distance = distance;
+				break;
+			}
 
-inside = y_length > 0;
-}
-else {
-}
-}
-else {
-//floats, oh no!
-float x = (float)start_vector.X + (float)(x_length * y_offset) / (float)y_length;
-float distance = test_point.X - x;
-if (distance < 0) distance *= -1;
 
-if (distance > 0.f && (distance < best_distance || !is_best)) {
-is_best = true;
-best_distance = distance;
+			focus_target = focus_target->getNext();
+		}
+		if (focus_target != nullptr) {
+			break;
+		}
 
-inside = y_length > 0;
-}
-}
-}
-focus = focus->next;
-} while (focus != root);
+		focus_local = focus_local->getNext();
+	}
+	if (focus_local == nullptr) return false;
 
-if (inside) {
-return FaceRelation(FaceRelationType::point_interior, nullptr);
+	//we have found a boundary pair that neighbors one another, merge them
+
+	auto tbd = focus_local->getValue();
+
+	auto tba = tbd->mergeWithFace(focus_target->getValue());
+
+	//now edit the boundary lists of both regions
+
+	Boundaries.absorb(tba);
+
+	Boundaries.remove(tbd);
+
+	target->Boundaries.clear();
+
+	return true;
 }
-else {
-return FaceRelation(FaceRelationType::point_exterior, nullptr);
-}
-}
-*/
+
+
 
 /* subAllocateFace
 //culls a polygon to the region represented by this face, then culls from tjos face that region to create a set of new regions

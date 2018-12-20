@@ -596,7 +596,7 @@ public:
 	//takes in a simple region boundary and divides this face into faces interior to, and faces exterior to that boundary
 	//void subAllocateFace(FLL<_P> const &boundary, FLL<Face*> &interiors, FLL<Face*> &exteriors);
 
-	void mergeWithFace(Face<_P>* target, FLL<Face<_P> *> &output) {
+	FLL<Face<_P> *> mergeWithFace(Face<_P>* target) {
 		FLL<Edge<_P> *> markToRemove;
 		FLL<Face<_P> *> product;
 
@@ -621,7 +621,7 @@ public:
 				product.remove(result.relevant);
 			}
 		}
-		output.absorb(product);
+		return product;
 	}
 
 	//void cleanBorder();

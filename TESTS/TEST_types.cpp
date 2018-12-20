@@ -1324,7 +1324,7 @@ TEST(FACE_Merge, append_merge) {
 
 	partner = focus->getFace();
 
-	test_object->mergeWithFace(partner, results);
+	results = test_object->mergeWithFace(partner);
 
 	//EXPECT_EQ(test_object->loopArea(), 800);
 	//EXPECT_EQ(focus->getInv()->getFace()->loopArea(), -800);
@@ -1347,7 +1347,7 @@ TEST(FACE_Merge, entire_merge) {
 
 	outside = test_object->getRoot()->getInv()->getFace();
 
-	test_object->mergeWithFace(outside, results);
+	results = test_object->mergeWithFace(outside);
 
 	EXPECT_TRUE(results.empty());
 }
@@ -1376,7 +1376,7 @@ TEST(FACE_Merge, merge_gap) {
 
 	outside = test_object->getRoot()->getInv()->getFace();
 
-	test_object->mergeWithFace(outside, results);
+	results = test_object->mergeWithFace(outside);
 
 	EXPECT_EQ(results.size(), 2);
 }
