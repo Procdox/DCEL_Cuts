@@ -524,9 +524,9 @@ public:
 	}
 
 	//return a list of the edges in the loop
-	FLL<Edge<_P> const *> getLoopEdges() const {
-		Edge<_P> const * focus = root;
-		FLL<Edge<_P> const *> target;
+	FLL<Edge<_P> *> getLoopEdges() {
+		Edge<_P> * focus = root;
+		FLL<Edge<_P> *> target;
 
 		do {
 			target.push(focus);

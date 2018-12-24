@@ -7,6 +7,9 @@
     <ClCompile Include="DCEL_Region.cpp">
       <Filter>private</Filter>
     </ClCompile>
+    <ClCompile Include="Ratio.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DCEL_fll.h">
@@ -19,6 +22,9 @@
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="DCEL_Region.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="Ratio.h">
       <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>

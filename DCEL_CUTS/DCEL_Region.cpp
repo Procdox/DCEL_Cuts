@@ -5,7 +5,7 @@ FaceRelation const getPointRelation(Face<Pint> const &rel, Pint const &test_poin
 	int count = 0;
 
 	bool is_best = false;
-	float best_distance = 0;
+	rto best_distance = 0;
 	bool inside = false;
 
 	do {
@@ -13,8 +13,8 @@ FaceRelation const getPointRelation(Face<Pint> const &rel, Pint const &test_poin
 		const Pint &end_vector = focus->getEnd()->getPosition();
 
 		//does it sit on
-		int y_length = end_vector.Y - start_vector.Y;
-		int y_offset = test_point.Y - start_vector.Y;
+		rto y_length = end_vector.Y - start_vector.Y;
+		rto y_offset = test_point.Y - start_vector.Y;
 
 		if (y_length == 0) {
 			if (y_offset == 0) {
@@ -28,38 +28,21 @@ FaceRelation const getPointRelation(Face<Pint> const &rel, Pint const &test_poin
 			continue;
 		}
 		else if ((y_offset <= y_length && y_offset >= 0) || y_offset >= y_length && y_offset <= 0) {
-			int x_length = end_vector.X - start_vector.X;
+			rto x_length = end_vector.X - start_vector.X;
 
-			if ((x_length * y_offset) % y_length == 0) {
-				//robust solution!
-				int x = start_vector.X + (x_length * y_offset) / y_length;
-				int distance = test_point.X - x;
+			rto x = start_vector.X + (x_length * y_offset) / y_length;
+			rto distance = test_point.X - x;
 
-				if (distance == 0) {
-					return FaceRelation(FaceRelationType::point_on_boundary, focus);
-				}
-				else if (distance > 0 && (distance < best_distance || !is_best)) {
-					is_best = true;
-					best_distance = distance;
-
-					inside = y_length > 0;
-				}
-				else {
-				}
+			if (distance == 0) {
+				return FaceRelation(FaceRelationType::point_on_boundary, focus);
 			}
-			else {
-				//floats, oh no!
-				float x = (float)start_vector.X + (float)(x_length * y_offset) / (float)y_length;
-				float distance = test_point.X - x;
-				if (distance < 0) distance *= -1;
+			else if (distance > 0 && (distance < best_distance || !is_best)) {
+				is_best = true;
+				best_distance = distance;
 
-				if (distance > 0.f && (distance < best_distance || !is_best)) {
-					is_best = true;
-					best_distance = distance;
-
-					inside = y_length > 0;
-				}
+				inside = y_length > 0;
 			}
+
 		}
 		focus = focus->getNext();
 	} while (focus != rel.getRoot());
@@ -143,7 +126,57 @@ bool Region::merge(Region * target) {
 	return true;
 }
 
+struct intersect {
+	Pint location;
+	Edge<Pint>* mark;
+	double distance;
+};
 
+//returns a list of intersects sorted by distance
+FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
+	FLL<Edge<Pint> const *> const & canidates) {
+
+	//detect intersect
+	FLL<intersect *> product;
+	return product;
+}
+
+void subAllocate(Region * target, FLL<Pint> const & boundary, 
+	FLL<Region *> & exteriors, FLL<Region *> & interiors) {
+	//subdivide all edges based on intersects
+	//this means all boundary edges are either
+	//exterior
+	//on point (with previous edge noted)
+	//interior
+	//subdivides are performed on inverse to preserve notess
+	FLL<Edge<Pint> *> canidates;
+	auto focus = target->Boundaries.getHead();
+	while (focus != nullptr) {
+		auto tba = focus->getValue()->getLoopEdges();
+		canidates.absorb(tba);
+	}
+
+	enum interactType { interior, exterior, on_edge };
+
+	struct interact {
+		Pint location;
+		interactType type;
+		Edge<Pint> * mark;
+		interact * next;
+	};
+
+	FLL<interact *> marks;
+
+	auto next = boundary.getHead();
+	auto last = boundary.getTail();
+
+	while (next != nullptr) {
+		//find and perform on all intersects
+
+		last = next;
+		next = next->getNext();
+	}
+}
 
 /* subAllocateFace
 //culls a polygon to the region represented by this face, then culls from tjos face that region to create a set of new regions

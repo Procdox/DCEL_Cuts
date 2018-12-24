@@ -1,75 +1,88 @@
 #include "DCEL_Point.h"
 
-int gcd(int a, int b) {
-	if (a == 0)
-		return b;
-	return gcd(b % a, a);
-}
-
 Pint::Pint() {
 	X = 0;
 	Y = 0;
 }
-Pint::Pint(int x, int y) {
+Pint::Pint(rto x, rto y) {
 	X = x;
 	Y = y;
 }
 
-Pint Pint::operator+(const Pint &add) const {
-	return Pint(X + add.X, Y + add.Y);
+Pint Pint::operator+(const Pint &target) const {
+	return Pint(X + target.X, Y + target.Y);
 }
-Pint Pint::operator-(const Pint &sub) const {
-	return Pint(X - sub.X, Y - sub.Y);
+Pint Pint::operator-(const Pint &target) const {
+	return Pint(X - target.X, Y - target.Y);
 }
-Pint Pint::operator*(int mul) const {
-	return Pint(X * mul, Y * mul);
+Pint Pint::operator*(int factor) const
+{
+	return Pint(X * factor, Y * factor);
 }
-Pint Pint::operator*(const Pint &mul) const {
-	return Pint(X * mul.X, Y * mul.Y);
+Pint Pint::operator*(rto factor) const {
+	return Pint(X * factor, Y * factor);
 }
-Pint Pint::operator/(int div) const {
-	//check(X % div == 0);
-	//check(Y % div == 0);
-	return Pint(X / div, Y / div);
+Pint Pint::operator*(const Pint &target) const {
+	return Pint(X * target.X, Y * target.Y);
 }
-Pint Pint::operator/(const Pint &div) const {
-	//check(X % div.X == 0);
-	//check(Y % div.Y == 0);
-	return Pint(X / div.X, Y / div.Y);
+Pint Pint::operator/(int factor) const
+{
+	return Pint(X / factor, Y / factor);
+}
+Pint Pint::operator/(rto factor) const {
+	return Pint(X / factor, Y / factor);
+}
+Pint Pint::operator/(const Pint &target) const {
+	return Pint(X / target.X, Y / target.Y);
 }
 
-Pint& Pint::operator+=(const Pint &add) {
-	X += add.X;
-	Y += add.Y;
+Pint& Pint::operator+=(const Pint &target) {
+	X += target.X;
+	Y += target.Y;
 	return *this;
 }
-Pint& Pint::operator-=(const Pint &sub) {
-	X -= sub.X;
-	Y -= sub.Y;
+Pint& Pint::operator-=(const Pint &target) {
+	X -= target.X;
+	Y -= target.Y;
 	return *this;
 }
-Pint& Pint::operator*=(float mul) {
-	X *= mul;
-	Y *= mul;
+Pint & Pint::operator*=(int factor)
+{
+	X *= factor;
+	Y *= factor;
+
 	return *this;
 }
-Pint& Pint::operator*=(const Pint &mul) {
-	X *= mul.X;
-	Y *= mul.Y;
+Pint& Pint::operator*=(rto factor) {
+	X *= factor;
+	Y *= factor;
+
 	return *this;
 }
-Pint& Pint::operator/=(int div) {
+Pint& Pint::operator*=(const Pint &target) {
+	X *= target.X;
+	Y *= target.Y;
+	return *this;
+}
+Pint & Pint::operator/=(int factor)
+{
+	X /= factor;
+	Y /= factor;
+
+	return *this;
+}
+Pint& Pint::operator/=(rto factor) {
 	//check(X % div == 0);
 	//check(Y % div == 0);
-	X /= div;
-	Y /= div;
+	X /= factor;
+	Y /= factor;
 	return *this;
 }
-Pint& Pint::operator/=(const Pint &div) {
+Pint& Pint::operator/=(const Pint &target) {
 	//check(X % div.X == 0);
 	//check(Y % div.Y == 0);
-	X /= div.X;
-	Y /= div.Y;
+	X /= target.X;
+	Y /= target.Y;
 	return *this;
 }
 
@@ -79,7 +92,7 @@ bool Pint::operator==(const Pint &test) const {
 bool Pint::operator!=(const Pint &test) const {
 	return test.X != X || test.Y != Y;
 }
-int Pint::SizeSquared() const {
+rto Pint::SizeSquared() const {
 	return X * X + Y * Y;
 }
 float Pint::Size() const {
@@ -88,8 +101,8 @@ float Pint::Size() const {
 }
 
 //void Normalize() {
-//	const int sizeSq = SizeSquared();
-//	const int sizeSq = SizeSquared();
+//	const rto sizeSq = SizeSquared();
+//	const rto sizeSq = SizeSquared();
 //	if (sizeSq == 0) {
 //		return;
 //	}
@@ -97,7 +110,7 @@ float Pint::Size() const {
 //	Y /= size;
 //}
 
-int Pint::Dot(const Pint &b) const {
+rto Pint::Dot(const Pint &b) const {
 	return X * b.X + Y * b.Y;
 }
 
@@ -109,7 +122,7 @@ point_near_segment_state Pint::getState(const Pint &start, const Pint &end) cons
 		return on_end;
 	}
 
-	const int TWAT = (X * start.Y - Y * start.X) + (start.X * end.Y - start.Y * end.X) + (end.X * Y - end.Y * X);
+	const rto TWAT = (X * start.Y - Y * start.X) + (start.X * end.Y - start.Y * end.X) + (end.X * Y - end.Y * X);
 	if (TWAT > 0) {
 		return left_of_segment;
 	}
@@ -117,7 +130,7 @@ point_near_segment_state Pint::getState(const Pint &start, const Pint &end) cons
 		return right_of_segment;
 	}
 
-	const int target_size = (start - end).SizeSquared();
+	const rto target_size = (start - end).SizeSquared();
 	if ((*this - end).SizeSquared() > target_size) {
 		return before_segment;
 	}
@@ -126,14 +139,6 @@ point_near_segment_state Pint::getState(const Pint &start, const Pint &end) cons
 	}
 
 	return on_segment;
-}
-
-Pint Pint::decompose(int &factor) {
-	//we need to find every common factor of x and y and remove it
-	factor = gcd(this->X, this->Y);
-	Pint product = *this;
-	product /= (factor);
-	return product;
 }
 
 bool Pint::areParrallel(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E) {
@@ -155,7 +160,7 @@ bool Pint::inRegionCW(const Pint &test, const Pint &before, const Pint &corner, 
 	return (test.getState(before, corner) == right_of_segment && test.getState(corner, after) == right_of_segment);
 }
 
-int Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E, Pint &Result) {
+rto Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E, Pint &Result) {
 	const auto A = A_E - A_S;
 	const auto B = B_E - B_S;
 
@@ -171,7 +176,7 @@ int Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const 
 	const auto t = (B.X * D.Y - B.Y * D.X); // denom;
 
 	if (denom > 0) {
-		if (s >= 0 && s <= denom && t >= 0 && t <= denom) {
+		if (s >= 0 && s <= denom && t >= 0  && t <= denom) {
 			Result = (A_E - A_S) * t / denom + A_S;
 			return (A_S - Result).SizeSquared();
 		}
@@ -186,7 +191,7 @@ int Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const 
 	return -1;
 }
 
-double Pint::area(FLL<Pint> const &boundary) {
+rto Pint::area(FLL<Pint> const &boundary) {
 	auto focus = boundary.getHead();
 
 	if (focus == nullptr) {
@@ -199,14 +204,14 @@ double Pint::area(FLL<Pint> const &boundary) {
 		return 0;
 	}
 
-	double total = 0;
+	rto total = 0;
 
 	do {
 		Pint A = focus->getValue();
 		Pint B = next->getValue();
 
-		double width = B.X - A.X;
-		double avg_height = (A.Y + B.Y) / 2;
+		rto width = B.X - A.X;
+		rto avg_height = (A.Y + B.Y) / 2;
 
 		total += width * avg_height;
 
@@ -217,8 +222,8 @@ double Pint::area(FLL<Pint> const &boundary) {
 	Pint A = focus->getValue();
 	Pint B = boundary.getHead()->getValue();
 
-	double width = B.X - A.X;
-	double avg_height = (A.Y + B.Y) / 2;
+	rto width = B.X - A.X;
+	rto avg_height = (A.Y + B.Y) / 2;
 
 	return total;
 }

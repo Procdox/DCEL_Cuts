@@ -38,7 +38,7 @@ class Region {
 	bool merge(Region*);
 
 	//restricts a region to another, returns a list of regions inside and outside the restricted region.
-	friend void allocate_from(Region*, Region*, FLL<Region*>, FLL<Region*>);
+	friend void subAllocate(Region*, FLL<Pint> const &, FLL<Region*> &, FLL<Region*> &);
 
 	//returns the relation of a point to a planar loop
 	//interior is defined by right-bound to edges, this means clockwise loops are inverted containment

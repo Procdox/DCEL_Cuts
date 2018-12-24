@@ -155,10 +155,12 @@
     <ClInclude Include="DCEL_Region.h" />
     <ClInclude Include="DCEL_types.h" />
     <ClInclude Include="DCEL_point.h" />
+    <ClInclude Include="Ratio.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DCEL_Region.cpp" />
     <ClCompile Include="DCEL_point.cpp" />
+    <ClCompile Include="Ratio.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
