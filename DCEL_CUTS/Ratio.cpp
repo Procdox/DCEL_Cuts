@@ -35,6 +35,13 @@ rto::rto(rto const & target) {
 	d = target.d;
 }
 
+rto & rto::operator=(int const & target)
+{
+	n = target;
+	d = 1;
+	return *this;
+}
+
 rto & rto::operator=(rto const & target)
 {
 	n = target.n;

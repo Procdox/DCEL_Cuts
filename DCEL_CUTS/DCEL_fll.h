@@ -266,6 +266,34 @@ public:
 		return s;
 	}
 
+	void qInsert(_T value, bool (*compare)(_T, _T)) {
+		node<_T>* focus = head;
+		node<_T>* after = head->next;
+
+		if (head == nullptr) {
+			push(value);
+			return;
+		}
+		if (compare(head->getValue(), value)) {
+			push(value);
+			return;
+		}
+		
+		while (after != nullptr) {
+			if (compare(after->getValue(), value)) {
+
+				focus->next = new node<_T>(value, after);
+
+				return;
+			}
+
+			focus = after;
+			after = after->next;
+		}
+
+		append(value);
+	}
+
 	void clear() {
 		auto focus = head;
 

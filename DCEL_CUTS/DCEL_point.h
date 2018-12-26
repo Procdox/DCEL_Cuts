@@ -61,7 +61,7 @@ struct Pint {
 
 	static bool inRegionCW(const Pint &test, const Pint &before, const Pint &corner, const Pint &after);
 
-	static rto getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E, Pint &Result);
+	static bool getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E, Pint &Result);
 
 	static rto area(FLL<Pint> const &boundary);
 

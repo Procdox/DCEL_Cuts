@@ -127,17 +127,44 @@ bool Region::merge(Region * target) {
 }
 
 struct intersect {
+
 	Pint location;
 	Edge<Pint>* mark;
-	double distance;
+	rto distance;
 };
+
+bool intersectSort(intersect *a, intersect *b) {
+	return a->distance < b->distance;
+}
 
 //returns a list of intersects sorted by distance
 FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
-	FLL<Edge<Pint> const *> const & canidates) {
+	FLL<Edge<Pint> *> const & canidates) {
 
 	//detect intersect
 	FLL<intersect *> product;
+
+	auto focus = canidates.getHead();
+	while (focus != nullptr) {
+		auto target = focus->getValue();
+
+		Pint intersect_location;
+		bool valid = Pint::getIntersect(start, stop, target->getStart()->getPosition(), target->getEnd()->getPosition(), intersect_location);
+
+		if (valid) {
+			intersect * output = new intersect();
+
+			output->location = intersect_location;
+			output->mark = target;
+			output->distance = (intersect_location - start).SizeSquared();
+
+			product.qInsert(output, intersectSort);
+
+		}
+		focus = focus->getNext();
+	}
+
+	
 	return product;
 }
 

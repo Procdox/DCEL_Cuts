@@ -16,6 +16,7 @@ public:
 	rto(rto &&target);
 	rto(rto const &target);
 
+	rto & operator=(int const & target);
 	rto & operator=(rto const & target);
 	
 	rto operator+(int factor) const;

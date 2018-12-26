@@ -160,7 +160,7 @@ bool Pint::inRegionCW(const Pint &test, const Pint &before, const Pint &corner, 
 	return (test.getState(before, corner) == right_of_segment && test.getState(corner, after) == right_of_segment);
 }
 
-rto Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E, Pint &Result) {
+bool Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const Pint &B_E, Pint &Result) {
 	const auto A = A_E - A_S;
 	const auto B = B_E - B_S;
 
