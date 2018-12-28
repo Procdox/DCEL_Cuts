@@ -1,5 +1,7 @@
 #include "DCEL_Region.h"
 
+
+
 FaceRelation const getPointRelation(Face<Pint> &rel, Pint const &test_point) {
 	Edge<Pint> * focus = rel.getRoot();
 	int count = 0;
@@ -53,6 +55,17 @@ FaceRelation const getPointRelation(Face<Pint> &rel, Pint const &test_point) {
 	else {
 		return FaceRelation(FaceRelationType::point_exterior, nullptr);
 	}
+}
+
+Region::Region(DCEL<Pint>* uni)
+{
+	universe = uni;
+}
+
+Region::Region(DCEL<Pint>* uni, FLL<Pint> const &bounds)
+{
+	universe = uni;
+	Boundaries.append(uni->draw(bounds));
 }
 
 FaceRelation Region::contains(Pint const &test_point) {
@@ -230,6 +243,8 @@ FLL<interact *> markRegion(Region * target, FLL<Pint> const & boundary) {
 	while (canidate_focus != nullptr) {
 		auto tba = canidate_focus->getValue()->getLoopEdges();
 		canidates.absorb(tba);
+
+		canidate_focus = canidate_focus->getNext();
 	}
 
 	while (next != nullptr) {
@@ -300,8 +315,10 @@ FLL<interact *> markRegion(Region * target, FLL<Pint> const & boundary) {
 }
 
 //insert strands into target, and determine face inclusions
-void determineInteriors(DCEL<Pint> & universe, Region * target, FLL<interact *> & details,
+void determineInteriors(Region * target, FLL<interact *> & details,
 	FLL<Face<Pint> *> & exteriors, FLL<Face<Pint> *> & interiors) {
+
+	auto universe = *target->universe;
 
 	exteriors = target->Boundaries;
 
@@ -336,7 +353,7 @@ void determineInteriors(DCEL<Pint> & universe, Region * target, FLL<interact *> 
 			interiors.push(into->mark->getFace());
 		}
 
-		from->type == FaceRelationType::point_on_boundary;
+		from->type = FaceRelationType::point_on_boundary;
 	}
 
 	while (next != nullptr) {
@@ -378,7 +395,7 @@ void determineInteriors(DCEL<Pint> & universe, Region * target, FLL<interact *> 
 	}
 }
 
-void subAllocate(DCEL<Pint> & universe, Region * target, FLL<Pint> const & boundary,
+void subAllocate(Region * target, FLL<Pint> const & boundary,
 	FLL<Region *> & exteriors, FLL<Region *> & interiors) {
 	//subdivide all edges based on intersects
 	//this means all boundary edges are either
@@ -392,7 +409,7 @@ void subAllocate(DCEL<Pint> & universe, Region * target, FLL<Pint> const & bound
 	FLL<Face<Pint> *> exterior_faces;
 	FLL<Face<Pint> *> interior_faces;
 
-	determineInteriors(universe, target, details, exterior_faces, interior_faces);
+	determineInteriors(target, details, exterior_faces, interior_faces);
 
 	//find regions, place holes
 
@@ -406,7 +423,7 @@ void subAllocate(DCEL<Pint> & universe, Region * target, FLL<Pint> const & bound
 	//for each interior face, create a region, add any symmetricly contained exterior faces to that region
 	auto interior_focus = interior_faces.getHead();
 	while (interior_focus != nullptr) {
-		Region* novel = new Region();
+		Region* novel = new Region(target->universe);
 
 		auto interior_face = interior_focus->getValue();
 		auto interior_root = interior_face->getRoot()->getStart()->getPosition();
@@ -443,7 +460,7 @@ void subAllocate(DCEL<Pint> & universe, Region * target, FLL<Pint> const & bound
 	auto exterior_focus = exterior_faces.getHead();
 
 	while (exterior_focus != nullptr) {
-		Region* novel = new Region();
+		Region* novel = new Region(target->universe);
 
 		auto base_face = exterior_focus->getValue();
 		auto base_root = base_face->getRoot()->getStart()->getPosition();

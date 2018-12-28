@@ -42,21 +42,28 @@ struct FaceRelation {
 
 class Region {
 	FLL<Face<Pint> *> Boundaries;
+	DCEL<Pint> * universe;
+
+	friend void determineInteriors(Region *, FLL<interact *> &,
+		FLL<Face<Pint> *> &, FLL<Face<Pint> *> &);
+
+	friend FLL<interact *> markRegion(Region *, FLL<Pint> const &);
+
+
+	friend void subAllocate(Region*, FLL<Pint> const &, FLL<Region*> &, FLL<Region*> &);
+
+public:
+	Region(DCEL<Pint> *);
+	Region(DCEL<Pint> *, FLL<Pint> const &);
+
+	FLL< Face<Pint> *> const * getBounds() {
+		return &Boundaries;
+	}
 
 	FaceRelation contains(Pint const &test_point);
 
 	//if non-trivially connected, will absorb the target region into this one via face merging
 	bool merge(Region*);
-
-	//restricts a region to another, returns a list of regions inside and outside the restricted region.
-	friend void determineInteriors(DCEL<Pint> &, Region *, FLL<interact *> &,
-		FLL<Face<Pint> *> &, FLL<Face<Pint> *> &);
-	friend FLL<interact *> markRegion(Region *, FLL<Pint> const &);
-	friend void subAllocate(DCEL<Pint> &, Region*, FLL<Pint> const &, FLL<Region*> &, FLL<Region*> &);
-
-	//returns the relation of a point to a planar loop
-	//interior is defined by right-bound to edges, this means clockwise loops are inverted containment
-	//FaceRelation<_P> const getPointRelation(_P const &) const;
 
 };
 
