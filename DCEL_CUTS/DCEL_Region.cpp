@@ -149,7 +149,11 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 		auto target = focus->getValue();
 
 		Pint intersect_location;
-		bool valid = Pint::getIntersect(start, stop, target->getStart()->getPosition(), target->getEnd()->getPosition(), intersect_location);
+
+		Pint test_start = target->getStart()->getPosition();
+		Pint test_stop = target->getEnd()->getPosition();
+
+		bool valid = Pint::getIntersect(start, stop, test_start, test_stop, intersect_location);
 
 		if (valid) {
 			intersect * output = new intersect();
@@ -163,6 +167,49 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 		}
 		else {
 			//parrallel test
+			if ((stop - start) == (test_stop - test_start) || (start - stop) == (test_stop - test_start)) {
+
+				//create an interesect for the ends of each segment, that lie on the other segment
+				if (Pint::isOnSegment(start, test_start, test_stop)) {
+					intersect * output = new intersect();
+
+					output->location = start;
+					output->mark = target;
+					output->distance = 0;
+
+					product.qInsert(output, intersectSort);
+				}
+
+				if (Pint::isOnSegment(stop, test_start, test_stop)) {
+					intersect * output = new intersect();
+
+					output->location = stop;
+					output->mark = target;
+					output->distance = (stop - start).SizeSquared();
+
+					product.qInsert(output, intersectSort);
+				}
+
+				if (Pint::isOnSegment(test_start, start, stop)) {
+					intersect * output = new intersect();
+
+					output->location = test_start;
+					output->mark = target;
+					output->distance = (test_start - start).SizeSquared();
+
+					product.qInsert(output, intersectSort);
+				}
+
+				if (Pint::isOnSegment(test_stop, start, stop)) {
+					intersect * output = new intersect();
+
+					output->location = test_stop;
+					output->mark = target;
+					output->distance = (test_stop - start).SizeSquared();
+
+					product.qInsert(output, intersectSort);
+				}
+			}
 		}
 		focus = focus->getNext();
 	}
