@@ -16,6 +16,9 @@
     <ClCompile Include="TESTS.cpp">
       <Filter>private</Filter>
     </ClCompile>
+    <ClCompile Include="TEST_region.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="private">

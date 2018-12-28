@@ -11,6 +11,8 @@ DCEL_region requires this representation as currently.
 */
 
 enum point_near_segment_state { left_of_segment, right_of_segment, before_segment, after_segment, on_start, on_end, on_segment };
+enum intersect_state {no_intersect, at_start_of_a, at_start_of_b, };
+
 
 struct Pint {
 	rto X;

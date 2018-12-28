@@ -171,6 +171,7 @@
     </ClCompile>
     <ClCompile Include="TESTS.cpp" />
     <ClCompile Include="TEST_point.cpp" />
+    <ClCompile Include="TEST_region.cpp" />
     <ClCompile Include="TEST_types.cpp" />
   </ItemGroup>
   <ItemGroup>

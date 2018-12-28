@@ -169,26 +169,18 @@ bool Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const
 	const auto denom = A.X * B.Y - A.Y * B.X;
 
 	if (denom == 0) { //REFACTOR
-		return -1;
+		return false;
 	}
 
-	const auto s = (A.X * D.Y - A.Y * D.X); // denom;
-	const auto t = (B.X * D.Y - B.Y * D.X); // denom;
+	const auto s = (A.X * D.Y - A.Y * D.X) / denom;
+	const auto t = (B.X * D.Y - B.Y * D.X) / denom;
 
-	if (denom > 0) {
-		if (s >= 0 && s <= denom && t >= 0  && t <= denom) {
-			Result = (A_E - A_S) * t / denom + A_S;
-			return (A_S - Result).SizeSquared();
-		}
-	}
-	else {
-		if (s <= 0 && s >= denom && t <= 0 && t >= denom) {
-			Result = (A_E - A_S) * t / denom + A_S;
-			return (A_S - Result).SizeSquared();
-		}
+	if (s >= 0 && s <= 1 && t >= 0  && t <= 1) {
+		Result = (A_E - A_S) * t / denom + A_S;
+		return true;
 	}
 
-	return -1;
+	return false;
 }
 
 rto Pint::area(FLL<Pint> const &boundary) {

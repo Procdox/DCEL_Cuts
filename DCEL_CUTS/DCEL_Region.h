@@ -15,18 +15,29 @@ clockwise boundaries contained within the clockwise boundary.
 
 //the relational types between a query point and a face
 enum FaceRelationType { point_exterior, point_on_boundary, point_interior };
+
+struct interact {
+	Pint location;
+	FaceRelationType type;
+	Edge<Pint> * mark;
+
+	interact() {
+		mark = nullptr;
+	}
+};
+
 //represents the relation a query point has to a face
 //returned by getPointRelation
 struct FaceRelation {
 	//this can only be created by queris / copying 
-	FaceRelation(FaceRelationType t, Edge<Pint> const * e) {
+	FaceRelation(FaceRelationType t, Edge<Pint> * e) {
 		type = t;
 		relevant = e;
 	}
 	FaceRelationType type;
 	//if type is point_on_boundary, this is the edge that contains the point
 	//root inclusive, end exclusive
-	Edge<Pint> const * relevant;
+	Edge<Pint> * relevant;
 };
 
 class Region {
@@ -38,7 +49,10 @@ class Region {
 	bool merge(Region*);
 
 	//restricts a region to another, returns a list of regions inside and outside the restricted region.
-	friend void subAllocate(Region*, FLL<Pint> const &, FLL<Region*> &, FLL<Region*> &);
+	friend void determineInteriors(DCEL<Pint> &, Region *, FLL<interact *> &,
+		FLL<Face<Pint> *> &, FLL<Face<Pint> *> &);
+	friend FLL<interact *> markRegion(Region *, FLL<Pint> const &);
+	friend void subAllocate(DCEL<Pint> &, Region*, FLL<Pint> const &, FLL<Region*> &, FLL<Region*> &);
 
 	//returns the relation of a point to a planar loop
 	//interior is defined by right-bound to edges, this means clockwise loops are inverted containment
