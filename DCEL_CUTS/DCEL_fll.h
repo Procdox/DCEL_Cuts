@@ -305,4 +305,15 @@ public:
 
 		tail = nullptr;
 	};
+
+	node<_T>* operator[](int index) {
+		node<_T>* focus = head;
+
+		while (focus != nullptr && index > 0) {
+			focus = focus->next;
+			index-=1;
+		}
+
+		return focus;
+	}
 };

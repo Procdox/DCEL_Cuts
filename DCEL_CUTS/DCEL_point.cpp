@@ -217,5 +217,7 @@ rto Pint::area(FLL<Pint> const &boundary) {
 	rto width = B.X - A.X;
 	rto avg_height = (A.Y + B.Y) / 2;
 
+	total += width * avg_height;
+
 	return total;
 }

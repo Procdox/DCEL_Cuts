@@ -52,14 +52,28 @@ class Region {
 	friend FLL<interact *> markRegion(Region *, FLL<Pint> const &);
 
 
-	friend void subAllocate(Region*, FLL<Pint> const &, FLL<Region*> &, FLL<Region*> &);
+	friend void subAllocate(Region* target, FLL<Pint> const & boundary, FLL<Region*> &exteriors, FLL<Region *> & interiors);
 
 public:
 	Region(DCEL<Pint> *);
 	Region(DCEL<Pint> *, FLL<Pint> const &);
+	Region(DCEL<Pint> *, Face<Pint> *);
 
 	FLL< Face<Pint> *> const * getBounds() {
 		return &Boundaries;
+	}
+
+	//returns nullptr if out of bounds
+	Face<Pint> * operator[](int index) {
+		auto ref = Boundaries[index];
+		if (ref == nullptr) {
+			throw "region boundary index DNE!";
+		}
+		return ref->getValue();
+	}
+
+	int size() const {
+		return Boundaries.size();
 	}
 
 	FaceRelation contains(Pint const &test_point);

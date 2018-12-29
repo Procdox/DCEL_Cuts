@@ -715,6 +715,16 @@ public:
 		}
 	}
 
+	int pointCount() const {
+		return points.size();
+	}
+	int edgeCount() const {
+		return edges.size();
+	}
+	int faceCount() const {
+		return faces.size();
+	}
+
 	//creates an edge and its inverse connecting two novel points
 	Edge<_P> * addEdge(_P a, _P b) {
 		Edge<_P> * result = createEdge();

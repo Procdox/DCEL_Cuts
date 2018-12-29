@@ -72,103 +72,200 @@ TEST(Region_Basics, Region_Contains) {
 
 
 TEST(Face_Cuts, Hole) {
+
+	//setup
 	DCEL<Pint> space;
-
-	FLL<Pint> boundary_big;
-	{
-		boundary_big.append(Pint(0, 0));
-		boundary_big.append(Pint(0, 20));
-		boundary_big.append(Pint(20, 20));
-		boundary_big.append(Pint(20, 0));
-	}
-	FLL<Pint> boundary_small_a;
-	{
-		boundary_small_a.append(Pint(2, 2));
-		boundary_small_a.append(Pint(2, 4));
-		boundary_small_a.append(Pint(4, 4));
-		boundary_small_a.append(Pint(4, 2));
-	}
-
+	
+	//results
 	FLL<Region *> interior;
 	FLL<Region *> exterior;
+	Region * null;
 
-	Region * product = new Region(&space, boundary_big);
+	//tested operations are performed within this block
+	{
+		FLL<Pint> boundary_big;
+		{
+			boundary_big.append(Pint(0, 0));
+			boundary_big.append(Pint(0, 20));
+			boundary_big.append(Pint(20, 20));
+			boundary_big.append(Pint(20, 0));
+		}
+		FLL<Pint> boundary_small_a;
+		{
+			boundary_small_a.append(Pint(2, 2));
+			boundary_small_a.append(Pint(2, 4));
+			boundary_small_a.append(Pint(4, 4));
+			boundary_small_a.append(Pint(4, 2));
+		}
 
-	subAllocate(product, boundary_small_a, exterior, interior);
+		Region * product = new Region(&space, boundary_big);
 
-	ASSERT_EQ(exterior.size(), 1);
+		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
+
+		null = new Region(&space, null_face);
+
+		subAllocate(product, boundary_small_a, exterior, interior);
+	}
+
+	//testing
+
+	EXPECT_EQ(space.pointCount(), 8);
+	EXPECT_EQ(space.edgeCount(), 16);
+	EXPECT_EQ(space.faceCount(), 4);
+
 	ASSERT_EQ(interior.size(), 1);
+	ASSERT_EQ(exterior.size(), 1);
 
-	auto ex_a = exterior.getHead()->getValue()->getBounds();
-	auto in_a = interior.getHead()->getValue()->getBounds();
+	ASSERT_NE(interior[0], nullptr);
+	ASSERT_NE(exterior[0], nullptr);
 
-	ASSERT_EQ(ex_a->size(), 2);
-	ASSERT_EQ(in_a->size(), 1);
+	Region * interior_0 = interior[0]->getValue();
+	Region * exterior_0 = exterior[0]->getValue();
 
-	auto ex_a_focus = ex_a->getHead();
-	auto ex_a_a = ex_a_focus->getValue();
-	ex_a_focus = ex_a_focus->getNext();
-	auto ex_a_b = ex_a_focus->getValue();
+	ASSERT_NE(interior_0, nullptr);
+	ASSERT_NE(exterior_0, nullptr);
 
-	auto in_focus = in_a->getHead();
-	auto in_a_a = in_focus->getValue();
+	ASSERT_EQ(interior_0->size(), 1);
+	ASSERT_EQ(exterior_0->size(), 2);
+	ASSERT_EQ(null->size(), 1);
 
-	auto area_a = Pint::area(ex_a_a->getLoopPoints());
-	auto area_b = Pint::area(ex_a_b->getLoopPoints());
-	auto area_c = Pint::area(in_a_a->getLoopPoints());
+	Face<Pint> * interior_0_0 = (*interior_0)[0];
+	Face<Pint> * exterior_0_0 = (*exterior_0)[0];
+	Face<Pint> * exterior_0_1 = (*exterior_0)[1];
+	Face<Pint> * null_0 = (*null)[0];
 
-	EXPECT_TRUE(area_a == rto(-4));
-	EXPECT_TRUE(area_b == rto(400));
+	ASSERT_NE(interior_0_0, nullptr);
+	ASSERT_NE(exterior_0_0, nullptr);
+	ASSERT_NE(exterior_0_1, nullptr);
+	ASSERT_NE(null_0, nullptr);
 
-	EXPECT_TRUE(area_c == rto(4));
+	EXPECT_EQ(interior_0_0->getLoopSize(), 4);
+	EXPECT_EQ(exterior_0_0->getLoopSize(), 4);
+	EXPECT_EQ(exterior_0_1->getLoopSize(), 4);
+	EXPECT_EQ(null_0->getLoopSize(), 4);
 
-	EXPECT_EQ(in_a_a->getRoot()->getFace(), ex_a_a->getRoot()->getInv()->getFace());
+	auto area_in_0_0 = Pint::area(interior_0_0->getLoopPoints());
+	auto area_ex_0_0 = Pint::area(exterior_0_0->getLoopPoints());
+	auto area_ez_0_1 = Pint::area(exterior_0_1->getLoopPoints());
+	auto area_null_0 = Pint::area(null_0->getLoopPoints());
+
+	EXPECT_TRUE(area_in_0_0 == rto(4));
+	EXPECT_TRUE(area_ex_0_0 == rto(-4));
+	EXPECT_TRUE(area_ez_0_1 == rto(400));
+	EXPECT_TRUE(area_null_0 == rto(-400));
+
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_FALSE(interior_0_0->getNeighbors().contains(exterior_0_1));
+	EXPECT_FALSE(interior_0_0->getNeighbors().contains(null_0));
+
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_0_0));
+	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(exterior_0_1));
+	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(null_0));
+
+	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(interior_0_0));
+	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(exterior_0_0));
+	EXPECT_TRUE(exterior_0_1->getNeighbors().contains(null_0));
+
+	EXPECT_FALSE(null_0->getNeighbors().contains(interior_0_0));
+	EXPECT_FALSE(null_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_1));
+
+
+	EXPECT_EQ(interior_0_0, exterior_0_0->getRoot()->getInv()->getFace());
+	EXPECT_EQ(null_0, exterior_0_1->getRoot()->getInv()->getFace());
 }
 
-/*
+
 TEST(Face_Cuts, Edge_Meeting_Cut) {
-	DCEL* space = new DCEL();
 
-	FLL<Pint> boundary_big;
+	//setup
+	DCEL<Pint> space;
+
+	//results
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
+	Region * null;
+
+	//tested operations are performed within this block
 	{
-		boundary_big.append(Pint(0, 0));
-		boundary_big.append(Pint(0, 20));
-		boundary_big.append(Pint(20, 20));
-		boundary_big.append(Pint(20, 0));
+		FLL<Pint> boundary_big;
+		{
+			boundary_big.append(Pint(0, 0));
+			boundary_big.append(Pint(0, 20));
+			boundary_big.append(Pint(20, 20));
+			boundary_big.append(Pint(20, 0));
+		}
+		FLL<Pint> boundary_small_a;
+		{
+			boundary_small_a.append(Pint(0, 2));
+			boundary_small_a.append(Pint(0, 4));
+			boundary_small_a.append(Pint(4, 4));
+			boundary_small_a.append(Pint(4, 2));
+		}
+
+		Region * product = new Region(&space, boundary_big);
+
+		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
+
+		null = new Region(&space, null_face);
+
+		subAllocate(product, boundary_small_a, exterior, interior);
 	}
-	FLL<Pint> boundary_small_a;
-	{
-		boundary_small_a.append(Pint(0, 2));
-		boundary_small_a.append(Pint(0, 4));
-		boundary_small_a.append(Pint(4, 4));
-		boundary_small_a.append(Pint(4, 2));
-	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	//testing
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
-	product->subAllocateFace(boundary_small_a, interior, exterior);
+	EXPECT_EQ(space.pointCount(), 8);
+	EXPECT_EQ(space.edgeCount(), 18);
+	EXPECT_EQ(space.faceCount(), 3);
 
-	EXPECT_EQ(exterior.size(), 1);
-	EXPECT_EQ(interior.size(), 1);
+	ASSERT_EQ(interior.size(), 1);
+	ASSERT_EQ(exterior.size(), 1);
 
-	EXPECT_EQ(interior[0]->getHoleCount(), 0);
-	EXPECT_EQ(exterior[0]->getHoleCount(), 0);
-	EXPECT_EQ(null->getHoleCount(), 1);
+	ASSERT_NE(interior[0], nullptr);
+	ASSERT_NE(exterior[0], nullptr);
 
-	EXPECT_EQ(interior[0]->borderCount(10), 4);
-	EXPECT_EQ(exterior[0]->borderCount(10), 8);
-	EXPECT_EQ(null->holeBorderCount(0, 10), 6);
+	Region * interior_0 = interior[0]->getValue();
+	Region * exterior_0 = exterior[0]->getValue();
 
-	EXPECT_EQ(interior[0]->getRootEdge()->loopArea(), 8);
-	EXPECT_EQ(exterior[0]->getRootEdge()->loopArea(), 392);
-	EXPECT_EQ(null->getHole(0)->loopArea(), -400);
+	ASSERT_NE(interior_0, nullptr);
+	ASSERT_NE(exterior_0, nullptr);
+
+	ASSERT_EQ(interior_0->size(), 1);
+	ASSERT_EQ(exterior_0->size(), 1);
+	ASSERT_EQ(null->size(), 1);
+
+	Face<Pint> * interior_0_0 = (*interior_0)[0];
+	Face<Pint> * exterior_0_0 = (*exterior_0)[0];
+	Face<Pint> * null_0 = (*null)[0];
+
+	ASSERT_NE(interior_0_0, nullptr);
+	ASSERT_NE(exterior_0_0, nullptr);
+	ASSERT_NE(null_0, nullptr);
+
+	EXPECT_EQ(interior_0_0->getLoopSize(), 4);
+	EXPECT_EQ(exterior_0_0->getLoopSize(), 8);
+	EXPECT_EQ(null_0->getLoopSize(), 6);
+
+	auto area_in_0_0 = Pint::area(interior_0_0->getLoopPoints());
+	auto area_ex_0_0 = Pint::area(exterior_0_0->getLoopPoints());
+	auto area_null_0 = Pint::area(null_0->getLoopPoints());
+
+	EXPECT_TRUE(area_in_0_0 == rto(8));
+	EXPECT_TRUE(area_ex_0_0 == rto(392));
+	EXPECT_TRUE(area_null_0 == rto(-400));
+
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(null_0));
+
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(null_0));
+
+	EXPECT_TRUE(null_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_0));
 }
-
+/*
 TEST(Face_Cuts, Point_Meeting_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -187,11 +284,11 @@ TEST(Face_Cuts, Point_Meeting_Cut) {
 		boundary_small_a.append(Pint(4, 2));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	EXPECT_EQ(exterior.size(), 1);
@@ -211,7 +308,7 @@ TEST(Face_Cuts, Point_Meeting_Cut) {
 }
 
 TEST(Face_Cuts, Matching_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -232,11 +329,11 @@ TEST(Face_Cuts, Matching_Cut) {
 		boundary_small_a.append(Pint(4, 2));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	EXPECT_EQ(exterior.size(), 1);
@@ -256,7 +353,7 @@ TEST(Face_Cuts, Matching_Cut) {
 }
 
 TEST(Face_Cuts, Before_Overlapping_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -277,11 +374,11 @@ TEST(Face_Cuts, Before_Overlapping_Cut) {
 		boundary_small_a.append(Pint(4, 1));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	auto debug_array = exterior[0]->getRootEdge()->listPoints();
@@ -303,7 +400,7 @@ TEST(Face_Cuts, Before_Overlapping_Cut) {
 }
 
 TEST(Face_Cuts, After_Overlapping_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -324,11 +421,11 @@ TEST(Face_Cuts, After_Overlapping_Cut) {
 		boundary_small_a.append(Pint(3, 4));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	auto debug_array = exterior[0]->getRootEdge()->listPoints();
@@ -350,7 +447,7 @@ TEST(Face_Cuts, After_Overlapping_Cut) {
 }
 
 TEST(Face_Cuts, Overlapping_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -371,11 +468,11 @@ TEST(Face_Cuts, Overlapping_Cut) {
 		boundary_small_a.append(Pint(4, 1));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	auto debug_array = exterior[0]->getRootEdge()->listPoints();
@@ -397,7 +494,7 @@ TEST(Face_Cuts, Overlapping_Cut) {
 }
 
 TEST(Face_Cuts, Stacked_Holes) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -421,14 +518,14 @@ TEST(Face_Cuts, Stacked_Holes) {
 		boundary_small_b.append(Pint(2, 4));
 	}
 
-	FLL<DCEL::Face*> interiorPintrep;
-	FLL<DCEL::Face*> exteriorPintrep;
+	FLL<Region *> interiorPintrep;
+	FLL<Region *> exteriorPintrep;
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_b, interiorPintrep, exteriorPintrep);
 	exteriorPintrep[0]->subAllocateFace(boundary_small_a, interior, exterior);
 
@@ -456,7 +553,7 @@ TEST(Face_Cuts, Stacked_Holes) {
 }
 
 TEST(Face_Cuts, Horshoe_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -477,11 +574,11 @@ TEST(Face_Cuts, Horshoe_Cut) {
 		boundary_small_a.append(Pint(16, -8));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	EXPECT_EQ(exterior.size(), 1);
@@ -504,7 +601,7 @@ TEST(Face_Cuts, Horshoe_Cut) {
 }
 
 TEST(Face_Cuts, Corner_Meeting_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -521,11 +618,11 @@ TEST(Face_Cuts, Corner_Meeting_Cut) {
 		boundary_small_a.append(Pint(4, 0));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	EXPECT_EQ(exterior.size(), 1);
@@ -545,7 +642,7 @@ TEST(Face_Cuts, Corner_Meeting_Cut) {
 }
 
 TEST(Face_Cuts, Edge_Crossing_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -562,11 +659,11 @@ TEST(Face_Cuts, Edge_Crossing_Cut) {
 		boundary_small_a.append(Pint(4, 2));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	EXPECT_EQ(exterior.size(), 1);
@@ -586,7 +683,7 @@ TEST(Face_Cuts, Edge_Crossing_Cut) {
 }
 
 TEST(Face_Cuts, Corner_Crossing_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -603,11 +700,11 @@ TEST(Face_Cuts, Corner_Crossing_Cut) {
 		boundary_small_a.append(Pint(4, -4));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	EXPECT_EQ(exterior.size(), 1);
@@ -627,7 +724,7 @@ TEST(Face_Cuts, Corner_Crossing_Cut) {
 }
 
 TEST(Face_Cuts, Exterior_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -644,10 +741,10 @@ TEST(Face_Cuts, Exterior_Cut) {
 		boundary_small_a.append(Pint(-2, 2));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
+	Region * product = new Region(&space, boundary_big);
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	EXPECT_EQ(exterior.size(), 1);
@@ -657,7 +754,7 @@ TEST(Face_Cuts, Exterior_Cut) {
 }
 
 TEST(Face_Cuts, Encapsulating_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -674,23 +771,23 @@ TEST(Face_Cuts, Encapsulating_Cut) {
 		boundary_small_a.append(Pint(22, -2));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	EXPECT_EQ(exterior.size(), 0);
 	EXPECT_EQ(interior.size(), 1);
 
 	EXPECT_EQ(interior[0], product);
-	EXPECT_EQ(interior[0]->getRootEdge()->getInverseEdge()->getFace(), null);
+	EXPECT_EQ(interior[0]->getRootEdge()->getInv()->getFace(), null);
 
 }
 
 TEST(Face_Cuts, Seperate_Holes) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -714,14 +811,14 @@ TEST(Face_Cuts, Seperate_Holes) {
 		boundary_small_b.append(Pint(4, 16));
 	}
 
-	FLL<DCEL::Face*> interiorPintrep;
-	FLL<DCEL::Face*> exteriorPintrep;
+	FLL<Region *> interiorPintrep;
+	FLL<Region *> exteriorPintrep;
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interiorPintrep, exteriorPintrep);
 	product->subAllocateFace(boundary_small_b, interior, exterior);
 
@@ -745,12 +842,12 @@ TEST(Face_Cuts, Seperate_Holes) {
 	EXPECT_EQ(exterior[0]->getHole(1)->loopArea(), -4);
 
 
-	EXPECT_EQ(exterior[0]->getHole(0)->getInverseEdge()->getFace(), interiorPintrep[0]);
-	EXPECT_EQ(exterior[0]->getHole(1)->getInverseEdge()->getFace(), interior[0]);
+	EXPECT_EQ(exterior[0]->getHole(0)->getInv()->getFace(), interiorPintrep[0]);
+	EXPECT_EQ(exterior[0]->getHole(1)->getInv()->getFace(), interior[0]);
 }
 
 TEST(Face_Cuts, Adjacent_Meeting_Holes) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -774,13 +871,13 @@ TEST(Face_Cuts, Adjacent_Meeting_Holes) {
 		boundary_small_b.append(Pint(6, 4));
 	}
 
-	FLL<DCEL::Face*> interiorPintrep;
-	FLL<DCEL::Face*> exteriorPintrep;
+	FLL<Region *> interiorPintrep;
+	FLL<Region *> exteriorPintrep;
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
+	Region * product = new Region(&space, boundary_big);
 	product->subAllocateFace(boundary_small_a, interiorPintrep, exteriorPintrep);
 	product->subAllocateFace(boundary_small_b, interior, exterior);
 
@@ -801,7 +898,7 @@ TEST(Face_Cuts, Adjacent_Meeting_Holes) {
 }
 
 TEST(Face_Cuts, Adjacent_Crossing_Holes) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -825,13 +922,13 @@ TEST(Face_Cuts, Adjacent_Crossing_Holes) {
 		boundary_small_b.append(Pint(6, 4));
 	}
 
-	FLL<DCEL::Face*> interiorPintrep;
-	FLL<DCEL::Face*> exteriorPintrep;
+	FLL<Region *> interiorPintrep;
+	FLL<Region *> exteriorPintrep;
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
+	Region * product = new Region(&space, boundary_big);
 	product->subAllocateFace(boundary_small_a, interiorPintrep, exteriorPintrep);
 	product->subAllocateFace(boundary_small_b, interior, exterior);
 
@@ -852,7 +949,7 @@ TEST(Face_Cuts, Adjacent_Crossing_Holes) {
 }
 
 TEST(Face_Cuts, Connecting_Holes) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -876,14 +973,14 @@ TEST(Face_Cuts, Connecting_Holes) {
 		boundary_small_b.append(Pint(2, 4));
 	}
 
-	FLL<DCEL::Face*> interiorPintrep;
-	FLL<DCEL::Face*> exteriorPintrep;
+	FLL<Region *> interiorPintrep;
+	FLL<Region *> exteriorPintrep;
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
-	DCEL::Face* null = product->getRootEdge()->getInverseEdge()->getFace();
+	Region * product = new Region(&space, boundary_big);
+	Region * null = product->getRootEdge()->getInv()->getFace();
 	product->subAllocateFace(boundary_small_a, interiorPintrep, exteriorPintrep);
 	product->subAllocateFace(boundary_small_b, interior, exterior);
 
@@ -911,7 +1008,7 @@ TEST(Face_Cuts, Connecting_Holes) {
 }
 
 TEST(Face_Cuts, Connecting_Several_Holes) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -942,16 +1039,16 @@ TEST(Face_Cuts, Connecting_Several_Holes) {
 		boundary_small_c.append(Pint(16, 5));
 	}
 
-	FLL<DCEL::Face*> interiorPintrep_a;
-	FLL<DCEL::Face*> exteriorPintrep_a;
+	FLL<Region *> interiorPintrep_a;
+	FLL<Region *> exteriorPintrep_a;
 
-	FLL<DCEL::Face*> interiorPintrep_b;
-	FLL<DCEL::Face*> exteriorPintrep_b;
+	FLL<Region *> interiorPintrep_b;
+	FLL<Region *> exteriorPintrep_b;
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
+	Region * product = new Region(&space, boundary_big);
 	product->subAllocateFace(boundary_small_a, interiorPintrep_a, exteriorPintrep_a);
 	product->subAllocateFace(boundary_small_b, interiorPintrep_b, exteriorPintrep_b);
 	product->subAllocateFace(boundary_small_c, interior, exterior);
@@ -979,7 +1076,7 @@ TEST(Face_Cuts, Connecting_Several_Holes) {
 }
 
 TEST(Face_Cuts, Splitting_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -995,10 +1092,10 @@ TEST(Face_Cuts, Splitting_Cut) {
 		boundary_small.append(Pint(20, 15));
 		boundary_small.append(Pint(20, 5));
 	}
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
+	Region * product = new Region(&space, boundary_big);
 	product->subAllocateFace(boundary_small, interior, exterior);
 
 	EXPECT_EQ(exterior.size(), 2);
@@ -1015,7 +1112,7 @@ TEST(Face_Cuts, Splitting_Cut) {
 }
 
 TEST(Face_Cuts, Divided_Crossing_Holes) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -1039,13 +1136,13 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 		boundary_small_b.append(Pint(18, 8));
 	}
 
-	FLL<DCEL::Face*> interiorPintrep;
-	FLL<DCEL::Face*> exteriorPintrep;
+	FLL<Region *> interiorPintrep;
+	FLL<Region *> exteriorPintrep;
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
+	Region * product = new Region(&space, boundary_big);
 	product->subAllocateFace(boundary_small_a, interiorPintrep, exteriorPintrep);
 	product->subAllocateFace(boundary_small_b, interior, exterior);
 
@@ -1068,7 +1165,7 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 }
 
 TEST(Face_Cuts, Triangles_Crossing_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -1086,10 +1183,10 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 		boundary_small_a.append(Pint(6, -1));
 	}
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
+	Region * product = new Region(&space, boundary_big);
 	product->subAllocateFace(boundary_small_a, interior, exterior);
 
 	EXPECT_EQ(interior.size(), 2);
@@ -1111,7 +1208,7 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 }
 
 TEST(Face_Cuts, DividedPintoint_Meet_Cut) {
-	DCEL* space = new DCEL();
+	DCEL<Pint> space;
 
 	FLL<Pint> boundary_big;
 	{
@@ -1137,13 +1234,13 @@ TEST(Face_Cuts, DividedPintoint_Meet_Cut) {
 		boundary_small_b.append(Pint(3, 1));
 	}
 
-	FLL<DCEL::Face*> interiorPintrep;
-	FLL<DCEL::Face*> exteriorPintrep;
+	FLL<Region *> interiorPintrep;
+	FLL<Region *> exteriorPintrep;
 
-	FLL<DCEL::Face*> interior;
-	FLL<DCEL::Face*> exterior;
+	FLL<Region *> interior;
+	FLL<Region *> exterior;
 
-	DCEL::Face* product = space->createFace(boundary_big);
+	Region * product = new Region(&space, boundary_big);
 	product->subAllocateFace(boundary_small_a, interiorPintrep, exteriorPintrep);
 	exteriorPintrep[0]->subAllocateFace(boundary_small_b, interior, exterior);
 

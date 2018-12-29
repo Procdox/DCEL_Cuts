@@ -68,6 +68,13 @@ Region::Region(DCEL<Pint>* uni, FLL<Pint> const &bounds)
 	Boundaries.append(uni->draw(bounds));
 }
 
+Region::Region(DCEL<Pint>* uni, Face<Pint>* source)
+{
+	Boundaries.push(source);
+
+	universe = uni;
+}
+
 FaceRelation Region::contains(Pint const &test_point) {
 	auto focus = Boundaries.getHead();
 	while (focus != nullptr) {
@@ -491,7 +498,7 @@ void subAllocate(Region * target, FLL<Pint> const & boundary,
 		exterior_focus = exterior_focus->getNext();
 	}
 
-
+	delete target;
 }
 
 /* subAllocateFace
