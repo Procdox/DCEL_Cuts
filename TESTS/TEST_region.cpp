@@ -1,6 +1,76 @@
 #include "pch.h"
 #include "..\DCEL_CUTS\DCEL_Region.h"
 
+TEST(Region_Basics, CW_Face_Contains) {
+	DCEL<Pint> space;
+
+	FLL<Pint> boundary_big;
+	{
+		boundary_big.append(Pint(0, 0));
+		boundary_big.append(Pint(0, 20));
+		boundary_big.append(Pint(20, 20));
+		boundary_big.append(Pint(20, 0));
+	}
+
+	auto target = space.draw(boundary_big);
+
+	//inside simple
+	EXPECT_EQ(getPointRelation(*target, Pint(2, 2)).type, FaceRelationType::point_interior);
+
+	//outside simple
+	EXPECT_EQ(getPointRelation(*target, Pint(-2, 2)).type, FaceRelationType::point_exterior);
+
+	//boundary simple
+	EXPECT_EQ(getPointRelation(*target, Pint(0, 2)).type, FaceRelationType::point_on_boundary);
+}
+
+TEST(Region_Basics, CCW_Face_Contains) {
+	DCEL<Pint> space;
+
+	FLL<Pint> boundary_big;
+	{
+		boundary_big.append(Pint(20, 0));
+		boundary_big.append(Pint(20, 20));
+		boundary_big.append(Pint(0, 20));
+		boundary_big.append(Pint(0, 0));
+	}
+
+	auto target = space.draw(boundary_big);
+
+	//inside simple
+	EXPECT_EQ(getPointRelation(*target, Pint(2, 2)).type, FaceRelationType::point_exterior);
+
+	//outside simple
+	EXPECT_EQ(getPointRelation(*target, Pint(-2, 2)).type, FaceRelationType::point_interior);
+
+	//boundary simple
+	EXPECT_EQ(getPointRelation(*target, Pint(0, 2)).type, FaceRelationType::point_on_boundary);
+}
+
+TEST(Region_Basics, Region_Contains) {
+	DCEL<Pint> space;
+
+	FLL<Pint> boundary_big;
+	{
+		boundary_big.append(Pint(0, 0));
+		boundary_big.append(Pint(0, 20));
+		boundary_big.append(Pint(20, 20));
+		boundary_big.append(Pint(20, 0));
+	}
+
+	Region * target = new Region(&space, boundary_big);
+
+	//inside simple
+	EXPECT_EQ(target->contains(Pint(2,2)).type, FaceRelationType::point_interior);
+
+	//outside simple
+	EXPECT_EQ(target->contains(Pint(-2, 2)).type, FaceRelationType::point_exterior);
+
+	//boundary simple
+	EXPECT_EQ(target->contains(Pint(0, 2)).type, FaceRelationType::point_on_boundary);
+}
+
+
 TEST(Face_Cuts, Hole) {
 	DCEL<Pint> space;
 

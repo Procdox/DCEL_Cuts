@@ -8,7 +8,7 @@ FaceRelation const getPointRelation(Face<Pint> &rel, Pint const &test_point) {
 
 	bool is_best = false;
 	rto best_distance = 0;
-	bool inside = false;
+	bool inside = Pint::area(rel.getLoopPoints()) < 0;
 
 	do {
 		const Pint &start_vector = focus->getStart()->getPosition();
@@ -318,8 +318,6 @@ FLL<interact *> markRegion(Region * target, FLL<Pint> const & boundary) {
 void determineInteriors(Region * target, FLL<interact *> & details,
 	FLL<Face<Pint> *> & exteriors, FLL<Face<Pint> *> & interiors) {
 
-	auto universe = *target->universe;
-
 	exteriors = target->Boundaries;
 
 	auto next = details.getHead();
@@ -333,9 +331,9 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 
 		if (into->type == FaceRelationType::point_interior) {
 
-			universe.addEdge(from->location, into->location);
+			target->universe->addEdge(from->location, into->location);
 
-			into->mark = universe.addEdge(from->mark, into->location);
+			into->mark = target->universe->addEdge(from->location, into->location);
 
 			from->mark = into->mark->getInv();
 
@@ -346,7 +344,7 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 			//this face will be removed
 			exteriors.remove(into->mark->getFace());
 
-			from->mark = universe.addEdge(into->mark, from->location);
+			from->mark = target->universe->addEdge(into->mark, from->location);
 
 			into->mark = from->mark->getInv();
 
@@ -354,6 +352,9 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 		}
 
 		from->type = FaceRelationType::point_on_boundary;
+
+		last = next;
+		next = next->getNext();
 	}
 
 	while (next != nullptr) {
@@ -363,13 +364,13 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 
 		if (into->type == FaceRelationType::point_interior) {
 
-			into->mark = universe.addEdge(from->mark, into->location);
+			into->mark = target->universe->addEdge(from->mark, into->location);
 
 		}
 		else if (into->type == FaceRelationType::point_on_boundary) {
 			if (from->mark->getNext() != into->mark) {
 
-				into->mark = universe.addEdge(from->mark, into->mark);
+				into->mark = target->universe->addEdge(from->mark, into->mark);
 
 				if (exteriors.remove(into->mark->getFace())) {
 					interiors.push(into->mark->getFace());
@@ -486,6 +487,8 @@ void subAllocate(Region * target, FLL<Pint> const & boundary,
 		novel->Boundaries.push(base_face);
 
 		exteriors.push(novel);
+
+		exterior_focus = exterior_focus->getNext();
 	}
 
 

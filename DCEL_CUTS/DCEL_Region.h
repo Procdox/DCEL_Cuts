@@ -40,6 +40,8 @@ struct FaceRelation {
 	Edge<Pint> * relevant;
 };
 
+FaceRelation const getPointRelation(Face<Pint> &rel, Pint const &test_point);
+
 class Region {
 	FLL<Face<Pint> *> Boundaries;
 	DCEL<Pint> * universe;
