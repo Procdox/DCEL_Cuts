@@ -1,6 +1,60 @@
 #include "pch.h"
 #include "..\DCEL_CUTS\DCEL_Region.h"
 
+TEST(Region_Basics, Region_Creation) {
+
+	//setup
+	DCEL<Pint> space;
+
+	//results
+	Region * product, * null;
+
+	//tested operations are performed within this block
+	{
+		FLL<Pint> boundary_big;
+		{
+			boundary_big.append(Pint(0, 0));
+			boundary_big.append(Pint(0, 20));
+			boundary_big.append(Pint(20, 20));
+			boundary_big.append(Pint(20, 0));
+		}
+
+		product = new Region(&space, boundary_big);
+
+		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
+
+		null = new Region(&space, null_face);
+	}
+
+	//testing
+
+	EXPECT_EQ(space.pointCount(), 4);
+	EXPECT_EQ(space.edgeCount(), 8);
+	EXPECT_EQ(space.faceCount(), 2);
+
+	ASSERT_EQ(product->size(), 1);
+	ASSERT_EQ(null->size(), 1);
+
+	Face<Pint> * product_0 = (*product)[0];
+	Face<Pint> * null_0 = (*null)[0];
+
+	ASSERT_NE(product_0, nullptr);
+	ASSERT_NE(null_0, nullptr);
+
+	EXPECT_EQ(product_0->getLoopSize(), 4);
+	EXPECT_EQ(null_0->getLoopSize(), 4);
+
+	auto area_prod_0 = Pint::area(product_0->getLoopPoints());
+	auto area_null_0 = Pint::area(null_0->getLoopPoints());
+
+	EXPECT_TRUE(area_prod_0 == rto(400));
+	EXPECT_TRUE(area_null_0 == rto(-400));
+
+	EXPECT_TRUE(product_0->getNeighbors().contains(null_0));
+
+	EXPECT_TRUE(null_0->getNeighbors().contains(product_0));
+}
+
 TEST(Region_Basics, CW_Face_Contains) {
 	DCEL<Pint> space;
 
@@ -24,6 +78,7 @@ TEST(Region_Basics, CW_Face_Contains) {
 	EXPECT_EQ(getPointRelation(*target, Pint(0, 2)).type, FaceRelationType::point_on_boundary);
 }
 
+
 TEST(Region_Basics, CCW_Face_Contains) {
 	DCEL<Pint> space;
 
@@ -46,6 +101,7 @@ TEST(Region_Basics, CCW_Face_Contains) {
 	//boundary simple
 	EXPECT_EQ(getPointRelation(*target, Pint(0, 2)).type, FaceRelationType::point_on_boundary);
 }
+
 
 TEST(Region_Basics, Region_Contains) {
 	DCEL<Pint> space;
@@ -169,10 +225,6 @@ TEST(Face_Cuts, Hole) {
 	EXPECT_FALSE(null_0->getNeighbors().contains(interior_0_0));
 	EXPECT_FALSE(null_0->getNeighbors().contains(exterior_0_0));
 	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_1));
-
-
-	EXPECT_EQ(interior_0_0, exterior_0_0->getRoot()->getInv()->getFace());
-	EXPECT_EQ(null_0, exterior_0_1->getRoot()->getInv()->getFace());
 }
 
 
@@ -263,6 +315,8 @@ TEST(Face_Cuts, Edge_Meeting_Cut) {
 	EXPECT_TRUE(null_0->getNeighbors().contains(interior_0_0));
 	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_0));
 }
+
+
 /*
 TEST(Face_Cuts, Point_Meeting_Cut) {
 	DCEL<Pint> space;

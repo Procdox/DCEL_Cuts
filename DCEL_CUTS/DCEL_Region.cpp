@@ -338,8 +338,6 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 
 		if (into->type == FaceRelationType::point_interior) {
 
-			target->universe->addEdge(from->location, into->location);
-
 			into->mark = target->universe->addEdge(from->location, into->location);
 
 			from->mark = into->mark->getInv();

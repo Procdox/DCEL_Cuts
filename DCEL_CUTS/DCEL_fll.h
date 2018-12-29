@@ -45,11 +45,13 @@ class FLL {
 
 	node<_T>* head;
 	node<_T>* tail;
+	int length;
 
 public:
 	FLL() {
 		head = nullptr;
 		tail = nullptr;
+		length = 0;
 	};
 	~FLL() {
 		clear();
@@ -84,6 +86,8 @@ public:
 		head = new node<_T>(value, head);
 
 		if (tail == nullptr) tail = head;
+
+		length++;
 	};
 
 	void append(_T value) {
@@ -95,6 +99,8 @@ public:
 			head = new node<_T>(value, nullptr);
 			tail = head;
 		}
+
+		length++;
 	}
 
 	//returns the element at head, undefined behavior if empty
@@ -107,6 +113,8 @@ public:
 		head = to_be;
 
 		if (head == nullptr) tail = nullptr;
+
+		length--;
 
 		return product;
 	};
@@ -130,14 +138,14 @@ public:
 	node<_T>* getHead() {
 		return head;
 	};
-	const node<_T>* getHead() const {
+	node<_T> const * getHead() const {
 		return head;
 	};
 
 	node<_T>* getTail() {
 		return tail;
 	};
-	const node<_T>* getTail() const {
+	node<_T> const * getTail() const {
 		return tail;
 	};
 
@@ -167,6 +175,7 @@ public:
 			if (head == nullptr) tail = nullptr;
 
 			delete focus;
+			length--;
 
 			return true;
 		}
@@ -181,6 +190,7 @@ public:
 				focus->next = after->next;
 
 				delete after;
+				length--;
 
 				return true;
 			}
@@ -234,6 +244,8 @@ public:
 
 		if (head == nullptr) tail = nullptr;
 
+		length -= count;
+
 		return count;
 	};
 
@@ -250,7 +262,11 @@ public:
 
 			tail = target.tail;
 
+			length += target.length;
+
 			target.head = nullptr;
+			target.tail = nullptr;
+			target.length = 0;
 		}
 	}
 
@@ -266,9 +282,15 @@ public:
 		return s;
 	}
 
+	int l() const {
+		return l;
+	}
+
 	void qInsert(_T value, bool (*compare)(_T, _T)) {
 		node<_T>* focus = head;
 		node<_T>* after = head->next;
+
+		length++;
 
 		if (head == nullptr) {
 			push(value);
@@ -304,6 +326,8 @@ public:
 		}
 
 		tail = nullptr;
+
+		length = 0;
 	};
 
 	node<_T>* operator[](int index) {
