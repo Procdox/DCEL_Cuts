@@ -113,12 +113,16 @@ TEST(Face_Cuts, Hole) {
 	auto in_focus = in_a->getHead();
 	auto in_a_a = in_focus->getValue();
 
-	EXPECT_EQ(Pint::area(ex_a_a->getLoopPoints()), 400);
-	EXPECT_EQ(Pint::area(ex_a_b->getLoopPoints()), -4);
+	auto area_a = Pint::area(ex_a_a->getLoopPoints());
+	auto area_b = Pint::area(ex_a_b->getLoopPoints());
+	auto area_c = Pint::area(in_a_a->getLoopPoints());
 
-	EXPECT_EQ(Pint::area(in_a_a->getLoopPoints()), 4);
+	EXPECT_TRUE(area_a == rto(-4));
+	EXPECT_TRUE(area_b == rto(400));
 
-	EXPECT_EQ(in_a_a->getRoot()->getFace(), ex_a_b->getRoot()->getInv()->getFace());
+	EXPECT_TRUE(area_c == rto(4));
+
+	EXPECT_EQ(in_a_a->getRoot()->getFace(), ex_a_a->getRoot()->getInv()->getFace());
 }
 
 /*
