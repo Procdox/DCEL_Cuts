@@ -94,7 +94,7 @@ TEST(Face_Cuts, Hole) {
 
 	Region * product = new Region(&space, boundary_big);
 
-	subAllocate(product, boundary_small_a, interior, exterior);
+	subAllocate(product, boundary_small_a, exterior, interior);
 
 	ASSERT_EQ(exterior.size(), 1);
 	ASSERT_EQ(interior.size(), 1);
