@@ -287,8 +287,8 @@ public:
 	}
 
 	void qInsert(_T value, bool (*compare)(_T, _T)) {
-		node<_T>* focus = head;
-		node<_T>* after = head->next;
+		node<_T> * focus = head;
+		node<_T> * after;
 
 		length++;
 
@@ -296,10 +296,13 @@ public:
 			push(value);
 			return;
 		}
+
 		if (compare(head->getValue(), value)) {
 			push(value);
 			return;
 		}
+
+		after = head->next;
 		
 		while (after != nullptr) {
 			if (compare(after->getValue(), value)) {

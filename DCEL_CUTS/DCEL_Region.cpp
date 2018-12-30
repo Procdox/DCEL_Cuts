@@ -187,7 +187,20 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 		}
 		else {
 			//parrallel test
-			if ((stop - start) == (test_stop - test_start) || (start - stop) == (test_stop - test_start)) {
+			Pint a = stop - start;
+			Pint b = test_stop - test_start;
+
+			rto x, y;
+			if (a.Y != 0 && b.Y != 0) {
+				x = a.X / a.Y;
+				y = b.X / b.Y;
+			}
+			else if(a.Y == 0 && b.Y == 0){
+				x = a.X / a.X;
+				y = b.X / b.X;
+			}
+
+			if (x == y || x == -y) {
 
 				//create an interesect for the ends of each segment, that lie on the other segment
 				if (Pint::isOnSegment(start, test_start, test_stop)) {
@@ -210,7 +223,7 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 					product.qInsert(output, intersectSort);
 				}
 
-				if (Pint::isOnSegment(test_start, start, stop)) {
+				if (Pint::isOnSegment(test_start, start, stop) && test_start != start && test_start != stop) {
 					intersect * output = new intersect();
 
 					output->location = test_start;
@@ -220,7 +233,7 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 					product.qInsert(output, intersectSort);
 				}
 
-				if (Pint::isOnSegment(test_stop, start, stop)) {
+				if (Pint::isOnSegment(test_stop, start, stop) && test_stop != start && test_stop != stop) {
 					intersect * output = new intersect();
 
 					output->location = test_stop;
@@ -310,6 +323,7 @@ FLL<interact *> markRegion(Region * target, FLL<Pint> const & boundary) {
 
 			feature->location = next->getValue();
 			feature->type = state.type;
+			feature->mark = state.relevant;
 
 			details.push(feature);
 		}

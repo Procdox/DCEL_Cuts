@@ -153,7 +153,7 @@ bool Pint::areParrallel(const Pint &A_S, const Pint &A_E, const Pint &B_S, const
 
 bool Pint::isOnSegment(const Pint &test, const Pint &a, const Pint &b) {
 	auto state = test.getState(a, b);
-	return (state == on_segment || state == on_start);
+	return (state == on_segment || state == on_start || state == on_end);
 }
 
 bool Pint::inRegionCW(const Pint &test, const Pint &before, const Pint &corner, const Pint &after) {
@@ -176,7 +176,7 @@ bool Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const
 	const auto t = (B.X * D.Y - B.Y * D.X) / denom;
 
 	if (s >= 0 && s <= 1 && t >= 0  && t <= 1) {
-		Result = (A_E - A_S) * t / denom + A_S;
+		Result = (A * t) + A_S;
 		return true;
 	}
 

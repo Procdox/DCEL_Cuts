@@ -50,6 +50,11 @@ rto & rto::operator=(rto const & target)
 	return *this;
 }
 
+rto rto::operator-() const
+{
+	return rto(-n,d);
+}
+
 rto rto::operator+(int factor) const
 {
 	int x = n + factor * d;
@@ -286,7 +291,7 @@ bool rto::operator>=(const rto & test) const
 
 bool rto::operator<=(const int & test) const
 {
-	return n < test * d;
+	return n <= test * d;
 }
 
 bool rto::operator<=(const rto & test) const
