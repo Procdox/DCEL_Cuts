@@ -597,101 +597,192 @@ TEST(Face_Cuts, Before_Overlapping_Cut) {
 	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_0));
 }
 
-/*
+
 TEST(Face_Cuts, After_Overlapping_Cut) {
+
+	//setup
 	DCEL<Pint> space;
 
-	FLL<Pint> boundary_big;
-	{
-		boundary_big.append(Pint(0, 0));
-		boundary_big.append(Pint(0, 2));
-		boundary_big.append(Pint(2, 2));
-		boundary_big.append(Pint(2, 4));
-		boundary_big.append(Pint(0, 4));
-		boundary_big.append(Pint(0, 20));
-		boundary_big.append(Pint(20, 20));
-		boundary_big.append(Pint(20, 0));
-	}
-	FLL<Pint> boundary_small_a;
-	{
-		boundary_small_a.append(Pint(1, 4));
-		boundary_small_a.append(Pint(1, 6));
-		boundary_small_a.append(Pint(3, 6));
-		boundary_small_a.append(Pint(3, 4));
-	}
-
+	//results
 	FLL<Region *> interior;
 	FLL<Region *> exterior;
+	Region * null;
 
-	Region * product = new Region(&space, boundary_big);
-	Region * null = product->getRootEdge()->getInv()->getFace();
-	product->subAllocateFace(boundary_small_a, interior, exterior);
+	//tested operations are performed within this block
+	{
+		FLL<Pint> boundary_big;
+		{
+			boundary_big.append(Pint(0, 0));
+			boundary_big.append(Pint(0, 2));
+			boundary_big.append(Pint(2, 2));
+			boundary_big.append(Pint(2, 4));
+			boundary_big.append(Pint(0, 4));
+			boundary_big.append(Pint(0, 20));
+			boundary_big.append(Pint(20, 20));
+			boundary_big.append(Pint(20, 0));
+		}
+		FLL<Pint> boundary_small_a;
+		{
+			boundary_small_a.append(Pint(1, 4));
+			boundary_small_a.append(Pint(1, 6));
+			boundary_small_a.append(Pint(3, 6));
+			boundary_small_a.append(Pint(3, 4));
+		}
 
-	auto debug_array = exterior[0]->getRootEdge()->listPoints();
+		Region * product = new Region(&space, boundary_big);
 
-	EXPECT_EQ(exterior.size(), 1);
-	EXPECT_EQ(interior.size(), 1);
+		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-	EXPECT_EQ(interior[0]->getHoleCount(), 0);
-	EXPECT_EQ(exterior[0]->getHoleCount(), 0);
-	EXPECT_EQ(null->getHoleCount(), 1);
+		null = new Region(&space, null_face);
 
-	EXPECT_EQ(interior[0]->borderCount(10), 5);
-	EXPECT_EQ(exterior[0]->borderCount(20), 12);
-	EXPECT_EQ(null->holeBorderCount(0, 10), 9);
+		subAllocate(product, boundary_small_a, exterior, interior);
+	}
 
-	EXPECT_EQ(interior[0]->getRootEdge()->loopArea(), 4);
-	EXPECT_EQ(exterior[0]->getRootEdge()->loopArea(), 392);
-	EXPECT_EQ(null->getHole(0)->loopArea(), -396);
+	//testing
+
+	EXPECT_EQ(space.pointCount(), 12);
+	EXPECT_EQ(space.edgeCount(), 26);
+	EXPECT_EQ(space.faceCount(), 3);
+
+	ASSERT_EQ(interior.size(), 1);
+	ASSERT_EQ(exterior.size(), 1);
+
+	ASSERT_NE(interior[0], nullptr);
+	ASSERT_NE(exterior[0], nullptr);
+
+	Region * interior_0 = interior[0]->getValue();
+	Region * exterior_0 = exterior[0]->getValue();
+
+	ASSERT_NE(interior_0, nullptr);
+	ASSERT_NE(exterior_0, nullptr);
+
+	ASSERT_EQ(interior_0->size(), 1);
+	ASSERT_EQ(exterior_0->size(), 1);
+	ASSERT_EQ(null->size(), 1);
+
+	Face<Pint> * interior_0_0 = (*interior_0)[0];
+	Face<Pint> * exterior_0_0 = (*exterior_0)[0];
+	Face<Pint> * null_0 = (*null)[0];
+
+	ASSERT_NE(interior_0_0, nullptr);
+	ASSERT_NE(exterior_0_0, nullptr);
+	ASSERT_NE(null_0, nullptr);
+
+	EXPECT_EQ(interior_0_0->getLoopSize(), 5);
+	EXPECT_EQ(exterior_0_0->getLoopSize(), 12);
+	EXPECT_EQ(null_0->getLoopSize(), 9);
+
+	auto area_in_0_0 = Pint::area(interior_0_0->getLoopPoints());
+	auto area_ex_0_0 = Pint::area(exterior_0_0->getLoopPoints());
+	auto area_null_0 = Pint::area(null_0->getLoopPoints());
+
+	EXPECT_TRUE(area_in_0_0 == rto(4));
+	EXPECT_TRUE(area_ex_0_0 == rto(392));
+	EXPECT_TRUE(area_null_0 == rto(-396));
+
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(null_0));
+
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(null_0));
+
+	EXPECT_TRUE(null_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_0));
 }
+
 
 TEST(Face_Cuts, Overlapping_Cut) {
+
+	//setup
 	DCEL<Pint> space;
 
-	FLL<Pint> boundary_big;
-	{
-		boundary_big.append(Pint(0, 0));
-		boundary_big.append(Pint(0, 2));
-		boundary_big.append(Pint(2, 2));
-		boundary_big.append(Pint(2, 4));
-		boundary_big.append(Pint(0, 4));
-		boundary_big.append(Pint(0, 20));
-		boundary_big.append(Pint(20, 20));
-		boundary_big.append(Pint(20, 0));
-	}
-	FLL<Pint> boundary_small_a;
-	{
-		boundary_small_a.append(Pint(2, 1));
-		boundary_small_a.append(Pint(2, 5));
-		boundary_small_a.append(Pint(4, 5));
-		boundary_small_a.append(Pint(4, 1));
-	}
-
+	//results
 	FLL<Region *> interior;
 	FLL<Region *> exterior;
+	Region * null;
 
-	Region * product = new Region(&space, boundary_big);
-	Region * null = product->getRootEdge()->getInv()->getFace();
-	product->subAllocateFace(boundary_small_a, interior, exterior);
+	{
+		FLL<Pint> boundary_big;
+		{
+			boundary_big.append(Pint(0, 0));
+			boundary_big.append(Pint(0, 2));
+			boundary_big.append(Pint(2, 2));
+			boundary_big.append(Pint(2, 4));
+			boundary_big.append(Pint(0, 4));
+			boundary_big.append(Pint(0, 20));
+			boundary_big.append(Pint(20, 20));
+			boundary_big.append(Pint(20, 0));
+		}
+		FLL<Pint> boundary_small_a;
+		{
+			boundary_small_a.append(Pint(2, 1));
+			boundary_small_a.append(Pint(2, 5));
+			boundary_small_a.append(Pint(4, 5));
+			boundary_small_a.append(Pint(4, 1));
+		}
 
-	auto debug_array = exterior[0]->getRootEdge()->listPoints();
+		Region * product = new Region(&space, boundary_big);
 
-	EXPECT_EQ(exterior.size(), 1);
-	EXPECT_EQ(interior.size(), 1);
+		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-	EXPECT_EQ(interior[0]->getHoleCount(), 0);
-	EXPECT_EQ(exterior[0]->getHoleCount(), 0);
-	EXPECT_EQ(null->getHoleCount(), 1);
+		null = new Region(&space, null_face);
 
-	EXPECT_EQ(interior[0]->borderCount(10), 6);
-	EXPECT_EQ(exterior[0]->borderCount(20), 12);
-	EXPECT_EQ(null->holeBorderCount(0, 10), 8);
+		subAllocate(product, boundary_small_a, exterior, interior);
+	}
 
-	EXPECT_EQ(interior[0]->getRootEdge()->loopArea(), 8);
-	EXPECT_EQ(exterior[0]->getRootEdge()->loopArea(), 388);
-	EXPECT_EQ(null->getHole(0)->loopArea(), -396);
+	//testing
+
+	EXPECT_EQ(space.pointCount(), 12);
+	EXPECT_EQ(space.edgeCount(), 26);
+	EXPECT_EQ(space.faceCount(), 3);
+
+	ASSERT_EQ(interior.size(), 1);
+	ASSERT_EQ(exterior.size(), 1);
+
+	ASSERT_NE(interior[0], nullptr);
+	ASSERT_NE(exterior[0], nullptr);
+
+	Region * interior_0 = interior[0]->getValue();
+	Region * exterior_0 = exterior[0]->getValue();
+
+	ASSERT_NE(interior_0, nullptr);
+	ASSERT_NE(exterior_0, nullptr);
+
+	ASSERT_EQ(interior_0->size(), 1);
+	ASSERT_EQ(exterior_0->size(), 1);
+	ASSERT_EQ(null->size(), 1);
+
+	Face<Pint> * interior_0_0 = (*interior_0)[0];
+	Face<Pint> * exterior_0_0 = (*exterior_0)[0];
+	Face<Pint> * null_0 = (*null)[0];
+
+	ASSERT_NE(interior_0_0, nullptr);
+	ASSERT_NE(exterior_0_0, nullptr);
+	ASSERT_NE(null_0, nullptr);
+
+	EXPECT_EQ(interior_0_0->getLoopSize(), 6);
+	EXPECT_EQ(exterior_0_0->getLoopSize(), 12);
+	EXPECT_EQ(null_0->getLoopSize(), 8);
+
+	auto area_in_0_0 = Pint::area(interior_0_0->getLoopPoints());
+	auto area_ex_0_0 = Pint::area(exterior_0_0->getLoopPoints());
+	auto area_null_0 = Pint::area(null_0->getLoopPoints());
+
+	EXPECT_TRUE(area_in_0_0 == rto(8));
+	EXPECT_TRUE(area_ex_0_0 == rto(388));
+	EXPECT_TRUE(area_null_0 == rto(-396));
+
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(null_0));
+
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(null_0));
+
+	EXPECT_TRUE(null_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_0));
 }
 
+/*
 TEST(Face_Cuts, Stacked_Holes) {
 	DCEL<Pint> space;
 
