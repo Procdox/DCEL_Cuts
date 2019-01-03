@@ -19,11 +19,13 @@ TEST(DCEL_Basics, add_edge) {
 
 	EXPECT_EQ(inverse->getFace(), test_object->getFace());
 
+	EXPECT_EQ(test_object, test_object->getFace()->getRoot());
+
 	EXPECT_EQ(test_object->getStart()->getPosition(), A);
 	EXPECT_EQ(test_object->getEnd()->getPosition(), B);
 }
 
-TEST(DCEL_Basics, add_edgePintair) {
+TEST(DCEL_Basics, add_edgePair) {
 	DCEL<Pint> space;
 	Pint A(0, 0);
 	Pint B(10, 0);
@@ -99,6 +101,53 @@ TEST(DCEL_Basics, add_edge_chain) {
 	EXPECT_EQ(link_C->getStart()->getPosition(), C);
 	EXPECT_EQ(link_C->getEnd()->getPosition(), A);
 }
+
+TEST(DCEL_Basics, add_edge_join) {
+	DCEL<Pint> space;
+	Pint A(0, 0);
+	Pint B(10, 0);
+	Pint C(0, 10);
+	Pint D(10, 10);
+
+	Edge<Pint> * link_A = space.addEdge(A, B);
+	Edge<Pint> * link_B = space.addEdge(C, D);
+	Edge<Pint> * link_C = space.addEdge(link_A, link_B);
+
+
+	Edge<Pint> * inv_A = link_A->getInv();
+	Edge<Pint> * inv_B = link_B->getInv();
+	Edge<Pint> * inv_C = link_C->getInv();
+
+	EXPECT_EQ(link_A->getNext(), link_C);
+	EXPECT_EQ(link_A->getLast(), inv_A);
+
+	EXPECT_EQ(link_B->getNext(), inv_C);
+	EXPECT_EQ(link_B->getLast(), inv_B);
+
+	EXPECT_EQ(link_C->getNext(), inv_B);
+	EXPECT_EQ(link_C->getLast(), link_A);
+
+	EXPECT_EQ(inv_A->getNext(), link_A);
+	EXPECT_EQ(inv_A->getLast(), inv_C);
+
+	EXPECT_EQ(inv_B->getNext(), link_B);
+	EXPECT_EQ(inv_B->getLast(), link_C);
+
+	EXPECT_EQ(inv_C->getNext(), inv_A);
+	EXPECT_EQ(inv_C->getLast(), link_B);
+
+	EXPECT_EQ(link_A->getFace(), inv_A->getFace());
+
+	EXPECT_EQ(link_A->getFace(), link_B->getFace());
+	EXPECT_EQ(link_A->getFace(), link_C->getFace());
+
+	EXPECT_EQ(inv_A->getFace(), inv_B->getFace());
+	EXPECT_EQ(inv_A->getFace(), inv_C->getFace());
+
+	EXPECT_EQ(link_C->getStart()->getPosition(), B);
+	EXPECT_EQ(link_C->getEnd()->getPosition(), D);
+}
+
 
 TEST(DCEL_Basics, draw_area) {
 	DCEL<Pint> space;

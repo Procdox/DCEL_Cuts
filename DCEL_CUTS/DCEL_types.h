@@ -748,6 +748,8 @@ public:
 		result->loop = loop;
 		result->inv->loop = loop;
 
+		loop->root = result;
+
 		return result;
 	}
 	//creates an edge and its inverse connecting after an edge to a novel point

@@ -355,8 +355,6 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 			into->mark = target->universe->addEdge(from->location, into->location);
 
 			from->mark = into->mark->getInv();
-
-			interiors.push(into->mark->getFace());
 		}
 		else if (into->type == FaceRelationType::point_on_boundary) {
 
@@ -366,8 +364,6 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 			from->mark = target->universe->addEdge(into->mark, from->location);
 
 			into->mark = from->mark->getInv();
-
-			interiors.push(into->mark->getFace());
 		}
 
 		from->type = FaceRelationType::point_on_boundary;
@@ -389,15 +385,30 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 		else if (into->type == FaceRelationType::point_on_boundary) {
 			if (from->mark->getNext() != into->mark) {
 
-				into->mark = target->universe->addEdge(from->mark, into->mark);
+				
 
-				if (exteriors.remove(into->mark->getFace())) {
-					interiors.push(into->mark->getFace());
-				}
+				if (into->mark->getFace() == from->mark->getFace()) {
+					interiors.push(from->mark->getFace());
 
-				if (into->mark->getInv()->getFace() != into->mark->getFace()) {
+					into->mark = target->universe->addEdge(from->mark, into->mark);
+
 					exteriors.push(into->mark->getInv()->getFace());
 				}
+				else {
+					exteriors.remove(into->mark->getFace());
+
+					into->mark = target->universe->addEdge(from->mark, into->mark);
+				}
+
+				
+
+				//if (exteriors.remove(into->mark->getFace())) {
+				//	interiors.push(into->mark->getFace());
+				//}
+
+				//if (into->mark->getInv()->getFace() != into->mark->getFace()) {
+				//	into->mark = target->universe->addEdge(from->mark, into->mark);
+				//}
 			}
 		}
 
