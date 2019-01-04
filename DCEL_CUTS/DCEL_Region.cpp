@@ -380,38 +380,40 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 		auto into = next->getValue();
 		auto from = last->getValue();
 
-		if (into->type == FaceRelationType::point_interior) {
+		if (from->type != FaceRelationType::point_exterior) {
+			if (into->type == FaceRelationType::point_interior) {
 
-			into->mark = target->universe->addEdge(from->mark, into->location);
+				into->mark = target->universe->addEdge(from->mark, into->location);
 
-		}
-		else if (into->type == FaceRelationType::point_on_boundary) {
-			if (from->mark->getNext() != into->mark) {
+			}
+			else if (into->type == FaceRelationType::point_on_boundary) {
+				if (from->mark->getNext() != into->mark) {
 
-				
 
-				if (into->mark->getFace() == from->mark->getFace()) {
-					interiors.push(from->mark->getFace());
 
-					into->mark = target->universe->addEdge(from->mark, into->mark);
+					if (into->mark->getFace() == from->mark->getFace()) {
+						interiors.push(from->mark->getFace());
 
-					exteriors.push(into->mark->getInv()->getFace());
+						into->mark = target->universe->addEdge(from->mark, into->mark);
+
+						exteriors.push(into->mark->getInv()->getFace());
+					}
+					else {
+						exteriors.remove(into->mark->getFace());
+
+						into->mark = target->universe->addEdge(from->mark, into->mark);
+					}
+
+
+
+					//if (exteriors.remove(into->mark->getFace())) {
+					//	interiors.push(into->mark->getFace());
+					//}
+
+					//if (into->mark->getInv()->getFace() != into->mark->getFace()) {
+					//	into->mark = target->universe->addEdge(from->mark, into->mark);
+					//}
 				}
-				else {
-					exteriors.remove(into->mark->getFace());
-
-					into->mark = target->universe->addEdge(from->mark, into->mark);
-				}
-
-				
-
-				//if (exteriors.remove(into->mark->getFace())) {
-				//	interiors.push(into->mark->getFace());
-				//}
-
-				//if (into->mark->getInv()->getFace() != into->mark->getFace()) {
-				//	into->mark = target->universe->addEdge(from->mark, into->mark);
-				//}
 			}
 		}
 
