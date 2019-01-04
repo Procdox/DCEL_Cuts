@@ -371,6 +371,9 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 		last = next;
 		next = next->getNext();
 	}
+	else if (last->getValue()->type == FaceRelationType::point_on_boundary) {
+		exteriors.remove(last->getValue()->mark->getFace());
+	}
 
 	while (next != nullptr) {
 
