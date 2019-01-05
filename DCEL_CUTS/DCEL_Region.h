@@ -20,6 +20,7 @@ struct interact {
 	Pint location;
 	FaceRelationType type;
 	Edge<Pint> * mark;
+	bool mid_interior;
 
 	interact() {
 		mark = nullptr;
