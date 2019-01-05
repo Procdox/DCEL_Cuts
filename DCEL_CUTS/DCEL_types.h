@@ -515,7 +515,7 @@ public:
 
 		do {
 			_P p = focus->root->getPosition();
-			target.push(p);
+			target.append(p);
 
 			focus = focus->next;
 		} while (focus != root);
@@ -529,7 +529,7 @@ public:
 		FLL<Edge<_P> *> target;
 
 		do {
-			target.push(focus);
+			target.append(focus);
 
 			focus = focus->next;
 		} while (focus != root);
@@ -545,7 +545,7 @@ public:
 		do {
 			Face<_P> const * canidate = focus->inv->loop;
 			if (!target.contains(canidate)) {
-				target.push(canidate);
+				target.append(canidate);
 			}
 			focus = focus->next;
 		} while (focus != root);
@@ -604,18 +604,18 @@ public:
 		do {
 
 			if (focus->inv->loop == target) {
-				markToRemove.push(focus);
+				markToRemove.append(focus);
 			}
 
 			focus = focus->next;
 		} while (focus != root);
 
-		product.push(this);
+		product.append(this);
 
 		while (!markToRemove.empty()) {
 			EdgeModResult<_P> result = markToRemove.pop()->remove();
 			if (result.type == EdgeModType::face_created) {
-				product.push(result.relevant);
+				product.append(result.relevant);
 			}
 			else if (result.type == EdgeModType::face_destroyed) {
 				product.remove(result.relevant);

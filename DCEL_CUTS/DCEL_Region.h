@@ -49,7 +49,7 @@ class Region {
 	friend void determineInteriors(Region *, FLL<interact *> &,
 		FLL<Face<Pint> *> &, FLL<Face<Pint> *> &);
 
-	friend FLL<interact *> markRegion(Region *, FLL<Pint> const &);
+	friend bool markRegion(Region *, FLL<Pint> const &, FLL<interact *> &);
 
 
 	friend void subAllocate(Region* target, FLL<Pint> const & boundary, FLL<Region*> &exteriors, FLL<Region *> & interiors);

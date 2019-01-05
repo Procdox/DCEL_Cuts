@@ -56,13 +56,23 @@ public:
 	~FLL() {
 		clear();
 	};
+	FLL(FLL<_T> &&refernce) {
+		head = refernce.head;
+		tail = refernce.tail;
+		length = refernce.length;
+
+		refernce.head = nullptr;
+		refernce.tail = nullptr;
+		refernce.length = 0;
+
+	}
 	FLL(FLL<_T> const &reference) {
 		node<_T> * focus = reference.head;
 		head = nullptr;
 		tail = nullptr;
 
 		while (focus != nullptr) {
-			push(focus->value);
+			append(focus->value);
 
 			focus = focus->next;
 		}
@@ -74,7 +84,7 @@ public:
 		tail = nullptr;
 
 		while (focus != nullptr) {
-			push(focus->value);
+			append(focus->value);
 
 			focus = focus->next;
 		}
@@ -318,7 +328,6 @@ public:
 
 		append(value);
 	}
-
 	void clear() {
 		auto focus = head;
 

@@ -162,6 +162,10 @@ TEST(DCEL_Basics, draw_area) {
 
 	test_object = space.draw(boundary);
 
+	EXPECT_EQ(space.pointCount(), 4);
+	EXPECT_EQ(space.edgeCount(), 8);
+	EXPECT_EQ(space.faceCount(), 2);
+
 	focus = test_object->getRoot();
 
 	EXPECT_EQ(focus->getStart()->getPosition(), Pint(0, 0));
@@ -186,9 +190,9 @@ TEST(DCEL_Basics, draw_area) {
 	EXPECT_EQ(focus->getFace(), test_object);
 	EXPECT_NE(focus->getInv()->getFace(), test_object);
 
+	focus = focus->getNext();
 
-	//EXPECT_EQ(test_object->loopArea(), 400);
-	//EXPECT_EQ(test_object->getRoot()->getInv()->getFace()->loopArea(), -400);
+	EXPECT_EQ(focus, test_object->getRoot());
 }
 
 TEST(DCEL_Basics, append_draw) {

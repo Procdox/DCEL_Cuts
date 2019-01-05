@@ -57,6 +57,68 @@ FaceRelation const getPointRelation(Face<Pint> &rel, Pint const &test_point) {
 	}
 }
 
+FaceRelationType const getPointRelation(FLL<Pint> const &rel, Pint const &test_point) {
+	node<Pint> const * focus = rel.getHead();
+	int count = 0;
+
+	bool is_best = false;
+	rto best_distance = 0;
+	bool inside = Pint::area(rel) < 0;
+
+	Pint start_vector, end_vector;
+
+	do {
+		start_vector = focus->getValue();
+		if (focus->getNext() != nullptr) {
+			end_vector = focus->getNext()->getValue();
+		}
+		else {
+			end_vector = rel.getHead()->getValue();
+		}
+
+		//does it sit on
+		rto y_length = end_vector.Y - start_vector.Y;
+		rto y_offset = test_point.Y - start_vector.Y;
+
+		if (y_length == 0) {
+			if (y_offset == 0) {
+				if ((start_vector.X <= test_point.X && test_point.X <= end_vector.X) ||
+					(start_vector.X >= test_point.X && test_point.X >= end_vector.X)) {
+
+					return FaceRelationType::point_on_boundary;
+				}
+			}
+			focus = focus->getNext();
+			continue;
+		}
+		else if ((y_offset <= y_length && y_offset >= 0) || y_offset >= y_length && y_offset <= 0) {
+			rto x_length = end_vector.X - start_vector.X;
+
+			rto x = start_vector.X + (x_length * y_offset) / y_length;
+			rto distance = test_point.X - x;
+
+			if (distance == 0) {
+				return FaceRelationType::point_on_boundary;
+			}
+			else if (distance > 0 && (distance < best_distance || !is_best)) {
+				is_best = true;
+				best_distance = distance;
+
+				inside = y_length > 0;
+			}
+
+		}
+		focus = focus->getNext();
+	} while (focus != nullptr);
+
+	if (inside) {
+		return FaceRelationType::point_interior;
+	}
+	else {
+		return FaceRelationType::point_exterior;
+	}
+}
+
 Region::Region(DCEL<Pint>* uni)
 {
 	universe = uni;
@@ -154,7 +216,7 @@ struct intersect {
 };
 
 bool intersectSort(intersect *a, intersect *b) {
-	return a->distance < b->distance;
+	return a->distance > b->distance;
 }
 
 //returns a list of intersects sorted by distance
@@ -252,12 +314,14 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 }
 
 //finds interact features for a suballocation, and subidivides region edges where needed
-FLL<interact *> markRegion(Region * target, FLL<Pint> const & boundary) {
-	FLL<interact *> details;
+//returns true if boundary is entirely external
+bool markRegion(Region * target, FLL<Pint> const & boundary, FLL<interact *>  & details) {
 	FLL<Edge<Pint> *> canidates;
 
 	auto next = boundary.getHead();
 	auto last = boundary.getTail();
+
+	bool exterior = true;
 
 	auto canidate_focus = target->Boundaries.getHead();
 	while (canidate_focus != nullptr) {
@@ -289,6 +353,7 @@ FLL<interact *> markRegion(Region * target, FLL<Pint> const & boundary) {
 				feature->location = relevant->location;
 				feature->type = FaceRelationType::point_on_boundary;
 
+				
 				if (relevant->location == mark->getEnd()->getPosition()) {
 					//no need to subdivide
 
@@ -309,7 +374,8 @@ FLL<interact *> markRegion(Region * target, FLL<Pint> const & boundary) {
 					end_collision = true;
 				}
 
-				details.push(feature);
+				exterior = false;
+				details.append(feature);
 			}
 
 			intersect_focus = intersect_focus->getNext();
@@ -319,20 +385,23 @@ FLL<interact *> markRegion(Region * target, FLL<Pint> const & boundary) {
 
 			auto state = target->contains(next->getValue());
 
+			
+
 			interact* feature = new interact();
 
 			feature->location = next->getValue();
 			feature->type = state.type;
 			feature->mark = state.relevant;
 
-			details.push(feature);
+			exterior = exterior && (state.type == FaceRelationType::point_exterior);
+			details.append(feature);
 		}
 
 		last = next;
 		next = next->getNext();
 	}
 
-	return details;
+	return exterior;
 }
 
 //insert strands into target, and determine face inclusions
@@ -358,9 +427,6 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 		}
 		else if (into->type == FaceRelationType::point_on_boundary) {
 
-			//this face will be removed
-			exteriors.remove(into->mark->getFace());
-
 			from->mark = target->universe->addEdge(into->mark, from->location);
 
 			into->mark = from->mark->getInv();
@@ -370,9 +436,6 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 
 		last = next;
 		next = next->getNext();
-	}
-	else if (last->getValue()->type == FaceRelationType::point_on_boundary) {
-		exteriors.remove(last->getValue()->mark->getFace());
 	}
 
 	while (next != nullptr) {
@@ -389,30 +452,22 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 			else if (into->type == FaceRelationType::point_on_boundary) {
 				if (from->mark->getNext() != into->mark) {
 
-
+					exteriors.remove(into->mark->getFace());
 
 					if (into->mark->getFace() == from->mark->getFace()) {
-						interiors.push(from->mark->getFace());
 
 						into->mark = target->universe->addEdge(from->mark, into->mark);
 
+						if (!interiors.contains(into->mark->getFace())) {
+							interiors.push(into->mark->getFace());
+						}
 						exteriors.push(into->mark->getInv()->getFace());
 					}
 					else {
-						exteriors.remove(into->mark->getFace());
+						exteriors.remove(from->mark->getFace());
 
 						into->mark = target->universe->addEdge(from->mark, into->mark);
 					}
-
-
-
-					//if (exteriors.remove(into->mark->getFace())) {
-					//	interiors.push(into->mark->getFace());
-					//}
-
-					//if (into->mark->getInv()->getFace() != into->mark->getFace()) {
-					//	into->mark = target->universe->addEdge(from->mark, into->mark);
-					//}
 				}
 			}
 		}
@@ -423,11 +478,16 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 
 	//does the entire boundary lie on a loop
 	if (interiors.empty()) {
-		auto target = last->getValue()->mark->getFace();
+		auto from = last->getValue();
 
-		exteriors.remove(target);
 
-		interiors.push(target);
+		if (from->type == FaceRelationType::point_on_boundary) {
+			auto target = from->mark->getFace();
+
+			exteriors.remove(target);
+
+			interiors.push(target);
+		}
 	}
 }
 
@@ -440,14 +500,27 @@ void subAllocate(Region * target, FLL<Pint> const & boundary,
 	//interior
 	//subdivides are performed on inverse to preserve marks
 
-	auto details = markRegion(target, boundary);
+	FLL<interact *> details;
+
+	bool exterior = markRegion(target, boundary, details);
 
 	FLL<Face<Pint> *> exterior_faces;
 	FLL<Face<Pint> *> interior_faces;
 
-	determineInteriors(target, details, exterior_faces, interior_faces);
+	if (exterior) {
+		auto test = target->Boundaries.getHead()->getValue()->getRoot()->getStart()->getPosition();
+		if (getPointRelation(boundary, test) == FaceRelationType::point_interior) {
 
-	//find regions, place holes
+			interiors.push(target);
+		}
+		else {
+			exteriors.push(target);
+		}
+	}
+	else {
+		determineInteriors(target, details, exterior_faces, interior_faces);
+
+		//find regions, place holes
 
 	//determine clockwise faces
 	//determine clockwise containment tree
@@ -457,76 +530,80 @@ void subAllocate(Region * target, FLL<Pint> const & boundary,
 	//determine exterior face sets with universal containment, create regions out of these\
 
 	//for each interior face, create a region, add any symmetricly contained exterior faces to that region
-	auto interior_focus = interior_faces.getHead();
-	while (interior_focus != nullptr) {
-		Region* novel = new Region(target->universe);
+		auto interior_focus = interior_faces.getHead();
+		while (interior_focus != nullptr) {
+			Region* novel = new Region(target->universe);
 
-		auto interior_face = interior_focus->getValue();
-		auto interior_root = interior_face->getRoot()->getStart()->getPosition();
+			auto interior_face = interior_focus->getValue();
+			auto interior_root = interior_face->getRoot()->getStart()->getPosition();
 
-		getPointRelation(*interior_face, interior_root);
+			getPointRelation(*interior_face, interior_root);
+
+			auto exterior_focus = exterior_faces.getHead();
+
+			while (exterior_focus != nullptr) {
+
+				auto exterior_face = exterior_focus->getValue();
+				auto exterior_root = exterior_face->getRoot()->getStart()->getPosition();
+
+				auto ex_contains_in = getPointRelation(*exterior_face, interior_root);
+				auto in_contains_ex = getPointRelation(*interior_face, exterior_root);
+
+				exterior_focus = exterior_focus->getNext();
+
+				if (ex_contains_in.type == FaceRelationType::point_interior && in_contains_ex.type == FaceRelationType::point_interior) {
+					novel->Boundaries.push(exterior_face);
+					exterior_faces.remove(exterior_face);
+				}
+			}
+
+			novel->Boundaries.push(interior_face);
+
+			interior_focus = interior_focus->getNext();
+
+			interiors.push(novel);
+		}
+
+		//for each exterior face, see which faces are symmetric with it and create regions
 
 		auto exterior_focus = exterior_faces.getHead();
 
 		while (exterior_focus != nullptr) {
+			Region* novel = new Region(target->universe);
 
-			auto exterior_face = exterior_focus->getValue();
-			auto exterior_root = exterior_face->getRoot()->getStart()->getPosition();
+			auto base_face = exterior_focus->getValue();
+			auto base_root = base_face->getRoot()->getStart()->getPosition();
 
-			auto ex_contains_in = getPointRelation(*exterior_face, interior_root);
-			auto in_contains_ex = getPointRelation(*interior_face, exterior_root);
+			auto compare = exterior_focus->getNext();
+
+			while (compare != nullptr) {
+
+				auto comp_face = compare->getValue();
+				auto comp_root = comp_face->getRoot()->getStart()->getPosition();
+
+				auto comp_contains_base = getPointRelation(*comp_face, base_root);
+				auto base_contains_comp = getPointRelation(*base_face, comp_root);
+
+				compare = compare->getNext();
+
+				if (comp_contains_base.type == FaceRelationType::point_interior && base_contains_comp.type == FaceRelationType::point_interior) {
+					novel->Boundaries.push(comp_face);
+					exterior_faces.remove(comp_face);
+				}
+			}
+
+			novel->Boundaries.push(base_face);
+
+			exteriors.push(novel);
 
 			exterior_focus = exterior_focus->getNext();
-
-			if (ex_contains_in.type == FaceRelationType::point_interior && in_contains_ex.type == FaceRelationType::point_interior) {
-				novel->Boundaries.push(exterior_face);
-				exterior_faces.remove(exterior_face);
-			}
 		}
 
-		novel->Boundaries.push(interior_face);
-
-		interior_focus = interior_focus->getNext();
-
-		interiors.push(novel);
+		delete target;
 	}
+	
 
-	//for each exterior face, see which faces are symmetric with it and create regions
-
-	auto exterior_focus = exterior_faces.getHead();
-
-	while (exterior_focus != nullptr) {
-		Region* novel = new Region(target->universe);
-
-		auto base_face = exterior_focus->getValue();
-		auto base_root = base_face->getRoot()->getStart()->getPosition();
-
-		auto compare = exterior_focus->getNext();
-
-		while (compare != nullptr) {
-
-			auto comp_face = compare->getValue();
-			auto comp_root = comp_face->getRoot()->getStart()->getPosition();
-
-			auto comp_contains_base = getPointRelation(*comp_face, base_root);
-			auto base_contains_comp = getPointRelation(*base_face, comp_root);
-			
-			compare = compare->getNext();
-
-			if (comp_contains_base.type == FaceRelationType::point_interior && base_contains_comp.type == FaceRelationType::point_interior) {
-				novel->Boundaries.push(comp_face);
-				exterior_faces.remove(comp_face);
-			}
-		}
-		
-		novel->Boundaries.push(base_face);
-
-		exteriors.push(novel);
-
-		exterior_focus = exterior_focus->getNext();
-	}
-
-	delete target;
+	
 }
 
 /* subAllocateFace
