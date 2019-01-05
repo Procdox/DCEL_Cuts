@@ -70,6 +70,7 @@ public:
 		node<_T> * focus = reference.head;
 		head = nullptr;
 		tail = nullptr;
+		length = 0;
 
 		while (focus != nullptr) {
 			append(focus->value);
@@ -82,6 +83,7 @@ public:
 		node<_T> * focus = reference.head;
 		head = nullptr;
 		tail = nullptr;
+		length = 0;
 
 		while (focus != nullptr) {
 			append(focus->value);
@@ -300,8 +302,6 @@ public:
 		node<_T> * focus = head;
 		node<_T> * after;
 
-		length++;
-
 		if (head == nullptr) {
 			push(value);
 			return;
@@ -318,7 +318,7 @@ public:
 			if (compare(after->getValue(), value)) {
 
 				focus->next = new node<_T>(value, after);
-
+				length++;
 				return;
 			}
 
