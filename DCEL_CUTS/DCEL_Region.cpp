@@ -316,93 +316,110 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 //finds interact features for a suballocation, and subidivides region edges where needed
 //returns true if boundary is entirely external
 bool markRegion(Region * target, FLL<Pint> const & boundary, FLL<interact *>  & details) {
-	FLL<Edge<Pint> *> canidates;
-
-	auto next = boundary.getHead();
-	auto last = boundary.getTail();
-
+	
 	bool exterior = true;
 
-	auto canidate_focus = target->Boundaries.getHead();
-	while (canidate_focus != nullptr) {
-		auto tba = canidate_focus->getValue()->getLoopEdges();
-		canidates.absorb(tba);
+	{
+		FLL<Edge<Pint> *> canidates;
 
-		canidate_focus = canidate_focus->getNext();
-	}
+		auto next = boundary.getHead();
+		auto last = boundary.getTail();
 
-	while (next != nullptr) {
-		//find and perform on all intersects
+		auto canidate_focus = target->Boundaries.getHead();
+		while (canidate_focus != nullptr) {
+			auto tba = canidate_focus->getValue()->getLoopEdges();
+			canidates.absorb(tba);
 
-		auto intersects = findIntersects(last->getValue(), next->getValue(), canidates);
-		auto intersect_focus = intersects.getHead();
+			canidate_focus = canidate_focus->getNext();
+		}
 
-		bool end_collision = false;
+		while (next != nullptr) {
+			//find and perform on all intersects
 
-		while (intersect_focus != nullptr) {
+			auto intersects = findIntersects(last->getValue(), next->getValue(), canidates);
+			auto intersect_focus = intersects.getHead();
 
-			auto relevant = intersect_focus->getValue();
-			auto mark = relevant->mark;
+			bool end_collision = false;
 
-			//ignore hits at the start of either segment
-			if (relevant->location != last->getValue() && relevant->location != mark->getStart()->getPosition()) {
+			while (intersect_focus != nullptr) {
+
+				auto relevant = intersect_focus->getValue();
+				auto mark = relevant->mark;
+
+				//ignore hits at the start of either segment
+				if (relevant->location != last->getValue() && relevant->location != mark->getStart()->getPosition()) {
+
+
+					interact* feature = new interact();
+
+					feature->location = relevant->location;
+					feature->type = FaceRelationType::point_on_boundary;
+
+
+					if (relevant->location == mark->getEnd()->getPosition()) {
+						//no need to subdivide
+
+						feature->mark = mark;
+					}
+					else {
+						//subdivide mark
+
+						mark->getInv()->subdivide(relevant->location);
+
+						feature->mark = mark->getLast();
+
+						canidates.push(feature->mark);
+					}
+
+					if (relevant->location == next->getValue()) {
+						//prevents duplicate features for ends of segments
+						end_collision = true;
+					}
+
+					exterior = false;
+					details.append(feature);
+				}
+
+				intersect_focus = intersect_focus->getNext();
+			}
+
+			if (!end_collision) {
+
+				auto state = target->contains(next->getValue());
+
 
 
 				interact* feature = new interact();
 
-				feature->location = relevant->location;
-				feature->type = FaceRelationType::point_on_boundary;
+				feature->location = next->getValue();
+				feature->type = state.type;
+				feature->mark = state.relevant;
 
-				
-				if (relevant->location == mark->getEnd()->getPosition()) {
-					//no need to subdivide
-
-					feature->mark = mark;
-				}
-				else {
-					//subdivide mark
-
-					mark->getInv()->subdivide(relevant->location);
-
-					feature->mark = mark->getLast();
-
-					canidates.push(feature->mark);
-				}
-
-				if (relevant->location == next->getValue()) {
-					//prevents duplicate features for ends of segments
-					end_collision = true;
-				}
-
-				exterior = false;
+				exterior = exterior && (state.type == FaceRelationType::point_exterior);
 				details.append(feature);
 			}
 
-			intersect_focus = intersect_focus->getNext();
+			last = next;
+			next = next->getNext();
 		}
-
-		if (!end_collision) {
-
-			auto state = target->contains(next->getValue());
-
-			
-
-			interact* feature = new interact();
-
-			feature->location = next->getValue();
-			feature->type = state.type;
-			feature->mark = state.relevant;
-
-			exterior = exterior && (state.type == FaceRelationType::point_exterior);
-			details.append(feature);
-		}
-
-		last = next;
-		next = next->getNext();
 	}
 
 	//calculate mid inclusion
 
+	{
+		auto next = details.getHead();
+		auto last = details.getTail();
+
+		while (next != nullptr) {
+			auto mid = (last->getValue()->location + next->getValue()->location) / 2;
+			auto result = target->contains(mid);
+			last->getValue()->mid_interior = (result.type != FaceRelationType::point_exterior);
+
+			last = next;
+			next = next->getNext();
+		}
+	}
+	
 	return exterior;
 }
 
@@ -457,13 +474,14 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 					exteriors.remove(into->mark->getFace());
 
 					if (into->mark->getFace() == from->mark->getFace()) {
+						if (from->mid_interior) {
+							into->mark = target->universe->addEdge(from->mark, into->mark);
 
-						into->mark = target->universe->addEdge(from->mark, into->mark);
-
-						if (!interiors.contains(into->mark->getFace())) {
-							interiors.push(into->mark->getFace());
+							if (!interiors.contains(into->mark->getFace())) {
+								interiors.push(into->mark->getFace());
+							}
+							exteriors.push(into->mark->getInv()->getFace());
 						}
-						exteriors.push(into->mark->getInv()->getFace());
 					}
 					else {
 						exteriors.remove(from->mark->getFace());

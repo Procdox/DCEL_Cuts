@@ -2241,10 +2241,10 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 	//testing
 
 	EXPECT_EQ(space.pointCount(), 16);
-	EXPECT_EQ(space.edgeCount(), 26);
-	EXPECT_EQ(space.faceCount(), 6);
+	EXPECT_EQ(space.edgeCount(), 36);
+	EXPECT_EQ(space.faceCount(), 5);
 
-	ASSERT_EQ(interior.size(), 2);
+	ASSERT_EQ(interior.size(), 3);
 	ASSERT_EQ(exterior.size(), 1);
 
 	ASSERT_NE(interior[0], nullptr);

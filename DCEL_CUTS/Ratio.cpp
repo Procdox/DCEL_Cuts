@@ -62,6 +62,10 @@ rto rto::operator+(int factor) const
 
 	int z = gcd(x, y);
 
+	if (y / z < 0) {
+		z *= -1;
+	}
+
 	return rto(x / z, y / z);
 }
 
@@ -71,6 +75,10 @@ rto rto::operator+(const rto & target) const
 	int y = d * target.d;
 
 	int z = gcd(x, y);
+
+	if (y / z < 0) {
+		z *= -1;
+	}
 
 	return rto(x / z, y / z);
 }
@@ -82,6 +90,10 @@ rto rto::operator-(int factor) const
 
 	int z = gcd(x, y);
 
+	if (y / z < 0) {
+		z *= -1;
+	}
+
 	return rto(x / z, y / z);
 }
 
@@ -91,6 +103,10 @@ rto rto::operator-(const rto & target) const
 	int y = d * target.d;
 
 	int z = gcd(x, y);
+
+	if (y / z < 0) {
+		z *= -1;
+	}
 
 	return rto(x / z, y / z);
 }
@@ -102,6 +118,10 @@ rto rto::operator*(int factor) const
 
 	int z = gcd(x, y);
 
+	if (y / z < 0) {
+		z *= -1;
+	}
+
 	return rto(x / z, y / z);
 }
 
@@ -111,6 +131,10 @@ rto rto::operator*(const rto & target) const
 	int y = d * target.d;
 
 	int z = gcd(x, y);
+
+	if (y / z < 0) {
+		z *= -1;
+	}
 
 	return rto(x / z, y / z);
 }
@@ -122,6 +146,10 @@ rto rto::operator/(int factor) const
 
 	int z = gcd(x, y);
 
+	if (y / z < 0) {
+		z *= -1;
+	}
+
 	return rto(x / z, y / z);
 }
 
@@ -131,6 +159,10 @@ rto rto::operator/(const rto & target) const
 	int y = d * target.n;
 
 	int z = gcd(x, y);
+
+	if (y / z < 0) {
+		z *= -1;
+	}
 
 	return rto(x / z, y / z);
 }
@@ -145,6 +177,11 @@ rto & rto::operator+=(int factor)
 	n = x / z;
 	d = y / z;
 
+	if (d < 0) {
+		n *= -1;
+		d *= -1;
+	}
+
 	return *this;
 }
 
@@ -157,6 +194,11 @@ rto & rto::operator+=(const rto & target)
 
 	n = x / z;
 	d = y / z;
+
+	if (d < 0) {
+		n *= -1;
+		d *= -1;
+	}
 
 	return *this;
 }
@@ -171,6 +213,11 @@ rto & rto::operator-=(int factor)
 	n = x / z;
 	d = y / z;
 
+	if (d < 0) {
+		n *= -1;
+		d *= -1;
+	}
+
 	return *this;
 }
 
@@ -183,6 +230,11 @@ rto & rto::operator-=(const rto & target)
 
 	n = x / z;
 	d = y / z;
+
+	if (d < 0) {
+		n *= -1;
+		d *= -1;
+	}
 
 	return *this;
 }
@@ -197,6 +249,11 @@ rto & rto::operator*=(int factor)
 	n = x / z;
 	d = y / z;
 
+	if (d < 0) {
+		n *= -1;
+		d *= -1;
+	}
+
 	return *this;
 }
 
@@ -209,6 +266,11 @@ rto & rto::operator*=(const rto & target)
 
 	n = x / z;
 	d = y / z;
+
+	if (d < 0) {
+		n *= -1;
+		d *= -1;
+	}
 
 	return *this;
 }
@@ -223,6 +285,11 @@ rto & rto::operator/=(int factor)
 	n = x / z;
 	d = y / z;
 
+	if (d < 0) {
+		n *= -1;
+		d *= -1;
+	}
+
 	return *this;
 }
 
@@ -235,6 +302,11 @@ rto & rto::operator/=(const rto & target)
 
 	n = x / z;
 	d = y / z;
+
+	if (d < 0) {
+		n *= -1;
+		d *= -1;
+	}
 
 	return *this;
 }
