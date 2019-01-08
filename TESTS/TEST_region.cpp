@@ -2212,17 +2212,17 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 		}
 		FLL<Pint> boundary_small_a;
 		{
-			boundary_small_a.append(Pint(8, 2));
-			boundary_small_a.append(Pint(8, 18));
-			boundary_small_a.append(Pint(12, 18));
-			boundary_small_a.append(Pint(12, 2));
+			boundary_small_a.append(Pint(8, 4));
+			boundary_small_a.append(Pint(8, 16));
+			boundary_small_a.append(Pint(12, 16));
+			boundary_small_a.append(Pint(12, 4));
 		}
 		FLL<Pint> boundary_small_b;
 		{
-			boundary_small_b.append(Pint(2, 8));
-			boundary_small_b.append(Pint(2, 12));
-			boundary_small_b.append(Pint(18, 12));
-			boundary_small_b.append(Pint(18, 8));
+			boundary_small_b.append(Pint(4, 8));
+			boundary_small_b.append(Pint(4, 12));
+			boundary_small_b.append(Pint(16, 12));
+			boundary_small_b.append(Pint(16, 8));
 		}
 
 		FLL<Region *> exterior_med;
@@ -2242,68 +2242,102 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 
 	EXPECT_EQ(space.pointCount(), 16);
 	EXPECT_EQ(space.edgeCount(), 36);
-	EXPECT_EQ(space.faceCount(), 5);
+	EXPECT_EQ(space.faceCount(), 6);
 
 	ASSERT_EQ(interior.size(), 3);
 	ASSERT_EQ(exterior.size(), 1);
 
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(interior[1], nullptr);
+	ASSERT_NE(interior[2], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
 	Region * interior_0 = interior[0]->getValue();
 	Region * interior_1 = interior[1]->getValue();
+	Region * interior_2 = interior[2]->getValue();
 	Region * exterior_0 = exterior[0]->getValue();
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
+	ASSERT_NE(interior_2, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
 
 	ASSERT_EQ(interior_0->size(), 1);
 	ASSERT_EQ(interior_1->size(), 1);
-	ASSERT_EQ(exterior_0->size(), 1);
+	ASSERT_EQ(interior_2->size(), 1);
+	ASSERT_EQ(exterior_0->size(), 2);
 	ASSERT_EQ(null->size(), 1);
 
 	Face<Pint> * interior_0_0 = (*interior_0)[0];
-	Face<Pint> * interior_1_0 = (*interior_0)[0];
+	Face<Pint> * interior_1_0 = (*interior_1)[0];
+	Face<Pint> * interior_2_0 = (*interior_2)[0];
 	Face<Pint> * exterior_0_0 = (*exterior_0)[0];
+	Face<Pint> * exterior_0_1 = (*exterior_0)[1];
 	Face<Pint> * null_0 = (*null)[0];
 
 	ASSERT_NE(interior_0_0, nullptr);
 	ASSERT_NE(interior_1_0, nullptr);
+	ASSERT_NE(interior_2_0, nullptr);
 	ASSERT_NE(exterior_0_0, nullptr);
+	ASSERT_NE(exterior_0_1, nullptr);
 	ASSERT_NE(null_0, nullptr);
 
 	EXPECT_EQ(interior_0_0->getLoopSize(), 4);
 	EXPECT_EQ(interior_1_0->getLoopSize(), 4);
+	EXPECT_EQ(interior_2_0->getLoopSize(), 8);
 	EXPECT_EQ(exterior_0_0->getLoopSize(), 12);
-	EXPECT_EQ(null_0->getLoopSize(), 8);
+	EXPECT_EQ(exterior_0_1->getLoopSize(), 4);
+	EXPECT_EQ(null_0->getLoopSize(), 4);
 
 	auto area_in_0_0 = Pint::area(interior_0_0->getLoopPoints());
-	auto area_in_1_0 = Pint::area(interior_0_0->getLoopPoints());
+	auto area_in_1_0 = Pint::area(interior_1_0->getLoopPoints());
+	auto area_in_2_0 = Pint::area(interior_2_0->getLoopPoints());
 	auto area_ex_0_0 = Pint::area(exterior_0_0->getLoopPoints());
+	auto area_ex_0_1 = Pint::area(exterior_0_1->getLoopPoints());
 	auto area_null_0 = Pint::area(null_0->getLoopPoints());
 
 	EXPECT_TRUE(area_in_0_0 == rto(16));
 	EXPECT_TRUE(area_in_1_0 == rto(16));
-	EXPECT_TRUE(area_ex_0_0 == rto(368));
+	EXPECT_TRUE(area_in_2_0 == rto(48));
+	EXPECT_TRUE(area_ex_0_0 == rto(-80));
+	EXPECT_TRUE(area_ex_0_1 == rto(400));
 	EXPECT_TRUE(area_null_0 == rto(-400));
 
+	EXPECT_FALSE(interior_0_0->getNeighbors().contains(interior_1_0));
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(interior_2_0));
 	EXPECT_TRUE(interior_0_0->getNeighbors().contains(exterior_0_0));
-	EXPECT_TRUE(interior_0_0->getNeighbors().contains(interior_1_0));
-	EXPECT_TRUE(interior_0_0->getNeighbors().contains(null_0));
+	EXPECT_FALSE(interior_0_0->getNeighbors().contains(exterior_0_1));
+	EXPECT_FALSE(interior_0_0->getNeighbors().contains(null_0));
 
-	EXPECT_TRUE(interior_1_0->getNeighbors().contains(interior_0_0));
+	EXPECT_FALSE(interior_1_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(interior_1_0->getNeighbors().contains(interior_2_0));
 	EXPECT_TRUE(interior_1_0->getNeighbors().contains(exterior_0_0));
-	EXPECT_TRUE(interior_1_0->getNeighbors().contains(null_0));
+	EXPECT_FALSE(interior_1_0->getNeighbors().contains(exterior_0_1));
+	EXPECT_FALSE(interior_1_0->getNeighbors().contains(null_0));
+
+	EXPECT_TRUE(interior_2_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(interior_2_0->getNeighbors().contains(interior_1_0));
+	EXPECT_TRUE(interior_2_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_FALSE(interior_2_0->getNeighbors().contains(exterior_0_1));
+	EXPECT_FALSE(interior_2_0->getNeighbors().contains(null_0));
 
 	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_0_0));
 	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_1_0));
-	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(null_0));
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_2_0));
+	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(exterior_0_1));
+	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(null_0));
 
-	EXPECT_TRUE(null_0->getNeighbors().contains(interior_0_0));
-	EXPECT_TRUE(null_0->getNeighbors().contains(interior_1_0));
-	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(interior_0_0));
+	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(interior_1_0));
+	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(interior_2_0));
+	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(exterior_0_0));
+	EXPECT_TRUE(exterior_0_1->getNeighbors().contains(null_0));
+
+	EXPECT_FALSE(null_0->getNeighbors().contains(interior_0_0));
+	EXPECT_FALSE(null_0->getNeighbors().contains(interior_1_0));
+	EXPECT_FALSE(null_0->getNeighbors().contains(interior_2_0));
+	EXPECT_FALSE(null_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_1));
 }
 
 TEST(Face_Cuts, Triangles_Crossing_Cut) {
@@ -2345,8 +2379,8 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 
 	//testing
 
-	EXPECT_EQ(space.pointCount(), 20);
-	EXPECT_EQ(space.edgeCount(), 26);
+	EXPECT_EQ(space.pointCount(), 9);
+	EXPECT_EQ(space.edgeCount(), 22);
 	EXPECT_EQ(space.faceCount(), 4);
 
 	ASSERT_EQ(interior.size(), 2);
@@ -2370,7 +2404,7 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 	ASSERT_EQ(null->size(), 1);
 
 	Face<Pint> * interior_0_0 = (*interior_0)[0];
-	Face<Pint> * interior_1_0 = (*interior_0)[0];
+	Face<Pint> * interior_1_0 = (*interior_1)[0];
 	Face<Pint> * exterior_0_0 = (*exterior_0)[0];
 	Face<Pint> * null_0 = (*null)[0];
 
@@ -2379,26 +2413,26 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 	ASSERT_NE(exterior_0_0, nullptr);
 	ASSERT_NE(null_0, nullptr);
 
-	EXPECT_EQ(interior_0_0->getLoopSize(), 4);
-	EXPECT_EQ(interior_1_0->getLoopSize(), 4);
-	EXPECT_EQ(exterior_0_0->getLoopSize(), 12);
-	EXPECT_EQ(null_0->getLoopSize(), 8);
+	EXPECT_EQ(interior_0_0->getLoopSize(), 3);
+	EXPECT_EQ(interior_1_0->getLoopSize(), 3);
+	EXPECT_EQ(exterior_0_0->getLoopSize(), 9);
+	EXPECT_EQ(null_0->getLoopSize(), 7);
 
 	auto area_in_0_0 = Pint::area(interior_0_0->getLoopPoints());
-	auto area_in_1_0 = Pint::area(interior_0_0->getLoopPoints());
+	auto area_in_1_0 = Pint::area(interior_1_0->getLoopPoints());
 	auto area_ex_0_0 = Pint::area(exterior_0_0->getLoopPoints());
 	auto area_null_0 = Pint::area(null_0->getLoopPoints());
 
-	EXPECT_TRUE(area_in_0_0 == rto(16));
-	EXPECT_TRUE(area_in_1_0 == rto(16));
-	EXPECT_TRUE(area_ex_0_0 == rto(368));
+	EXPECT_TRUE(area_in_0_0 == rto(2));
+	EXPECT_TRUE(area_in_1_0 == rto(2));
+	EXPECT_TRUE(area_ex_0_0 == rto(396));
 	EXPECT_TRUE(area_null_0 == rto(-400));
 
+	EXPECT_FALSE(interior_0_0->getNeighbors().contains(interior_1_0));
 	EXPECT_TRUE(interior_0_0->getNeighbors().contains(exterior_0_0));
-	EXPECT_TRUE(interior_0_0->getNeighbors().contains(interior_1_0));
 	EXPECT_TRUE(interior_0_0->getNeighbors().contains(null_0));
 
-	EXPECT_TRUE(interior_1_0->getNeighbors().contains(interior_0_0));
+	EXPECT_FALSE(interior_1_0->getNeighbors().contains(interior_0_0));
 	EXPECT_TRUE(interior_1_0->getNeighbors().contains(exterior_0_0));
 	EXPECT_TRUE(interior_1_0->getNeighbors().contains(null_0));
 
@@ -2462,68 +2496,87 @@ TEST(Face_Cuts, Divided_Meet_Cut) {
 
 	//testing
 
-	EXPECT_EQ(space.pointCount(), 20);
-	EXPECT_EQ(space.edgeCount(), 26);
-	EXPECT_EQ(space.faceCount(), 4);
+	EXPECT_EQ(space.pointCount(), 15);
+	EXPECT_EQ(space.edgeCount(), 36);
+	EXPECT_EQ(space.faceCount(), 5);
 
-	ASSERT_EQ(interior.size(), 2);
+	ASSERT_EQ(interior.size(), 3);
 	ASSERT_EQ(exterior.size(), 1);
 
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(interior[1], nullptr);
+	ASSERT_NE(interior[2], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
 	Region * interior_0 = interior[0]->getValue();
 	Region * interior_1 = interior[1]->getValue();
+	Region * interior_2 = interior[2]->getValue();
 	Region * exterior_0 = exterior[0]->getValue();
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
+	ASSERT_NE(interior_2, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
 
 	ASSERT_EQ(interior_0->size(), 1);
 	ASSERT_EQ(interior_1->size(), 1);
+	ASSERT_EQ(interior_2->size(), 1);
 	ASSERT_EQ(exterior_0->size(), 1);
 	ASSERT_EQ(null->size(), 1);
 
 	Face<Pint> * interior_0_0 = (*interior_0)[0];
-	Face<Pint> * interior_1_0 = (*interior_0)[0];
+	Face<Pint> * interior_1_0 = (*interior_1)[0];
+	Face<Pint> * interior_2_0 = (*interior_2)[0];
 	Face<Pint> * exterior_0_0 = (*exterior_0)[0];
 	Face<Pint> * null_0 = (*null)[0];
 
 	ASSERT_NE(interior_0_0, nullptr);
 	ASSERT_NE(interior_1_0, nullptr);
+	ASSERT_NE(interior_2_0, nullptr);
 	ASSERT_NE(exterior_0_0, nullptr);
 	ASSERT_NE(null_0, nullptr);
 
 	EXPECT_EQ(interior_0_0->getLoopSize(), 4);
 	EXPECT_EQ(interior_1_0->getLoopSize(), 4);
-	EXPECT_EQ(exterior_0_0->getLoopSize(), 12);
+	EXPECT_EQ(interior_2_0->getLoopSize(), 6);
+	EXPECT_EQ(exterior_0_0->getLoopSize(), 14);
 	EXPECT_EQ(null_0->getLoopSize(), 8);
 
 	auto area_in_0_0 = Pint::area(interior_0_0->getLoopPoints());
-	auto area_in_1_0 = Pint::area(interior_0_0->getLoopPoints());
+	auto area_in_1_0 = Pint::area(interior_1_0->getLoopPoints());
+	auto area_in_2_0 = Pint::area(interior_2_0->getLoopPoints());
 	auto area_ex_0_0 = Pint::area(exterior_0_0->getLoopPoints());
 	auto area_null_0 = Pint::area(null_0->getLoopPoints());
 
-	EXPECT_TRUE(area_in_0_0 == rto(16));
-	EXPECT_TRUE(area_in_1_0 == rto(16));
-	EXPECT_TRUE(area_ex_0_0 == rto(368));
-	EXPECT_TRUE(area_null_0 == rto(-400));
+	EXPECT_TRUE(area_in_0_0 == rto(1));
+	EXPECT_TRUE(area_in_1_0 == rto(1));
+	EXPECT_TRUE(area_in_2_0 == rto(4));
+	EXPECT_TRUE(area_ex_0_0 == rto(390));
+	EXPECT_TRUE(area_null_0 == rto(-396));
 
+	EXPECT_FALSE(interior_0_0->getNeighbors().contains(interior_1_0));
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(interior_2_0));
 	EXPECT_TRUE(interior_0_0->getNeighbors().contains(exterior_0_0));
-	EXPECT_TRUE(interior_0_0->getNeighbors().contains(interior_1_0));
 	EXPECT_TRUE(interior_0_0->getNeighbors().contains(null_0));
 
-	EXPECT_TRUE(interior_1_0->getNeighbors().contains(interior_0_0));
+	EXPECT_FALSE(interior_1_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(interior_1_0->getNeighbors().contains(interior_2_0));
 	EXPECT_TRUE(interior_1_0->getNeighbors().contains(exterior_0_0));
 	EXPECT_TRUE(interior_1_0->getNeighbors().contains(null_0));
 
+	EXPECT_TRUE(interior_2_0->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(interior_2_0->getNeighbors().contains(interior_1_0));
+	EXPECT_TRUE(interior_2_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_FALSE(interior_2_0->getNeighbors().contains(null_0));
+
 	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_0_0));
 	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_1_0));
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_2_0));
 	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(null_0));
 
 	EXPECT_TRUE(null_0->getNeighbors().contains(interior_0_0));
 	EXPECT_TRUE(null_0->getNeighbors().contains(interior_1_0));
+	EXPECT_FALSE(null_0->getNeighbors().contains(interior_2_0));
 	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_0));
 }
+

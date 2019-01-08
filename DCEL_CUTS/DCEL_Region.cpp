@@ -411,8 +411,8 @@ bool markRegion(Region * target, FLL<Pint> const & boundary, FLL<interact *>  & 
 		auto last = details.getTail();
 
 		while (next != nullptr) {
-			auto mid = (last->getValue()->location + next->getValue()->location) / 2;
-			auto result = target->contains(mid);
+			last->getValue()->mid = (last->getValue()->location + next->getValue()->location) / 2;
+			auto result = target->contains(last->getValue()->mid);
 			last->getValue()->mid_interior = (result.type != FaceRelationType::point_exterior);
 
 			last = next;
@@ -471,20 +471,26 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 			else if (into->type == FaceRelationType::point_on_boundary) {
 				if (from->mark->getNext() != into->mark) {
 
-					exteriors.remove(into->mark->getFace());
+					
 
 					if (into->mark->getFace() == from->mark->getFace()) {
 						if (from->mid_interior) {
-							into->mark = target->universe->addEdge(from->mark, into->mark);
+							exteriors.remove(into->mark->getFace());
 
-							if (!interiors.contains(into->mark->getFace())) {
-								interiors.push(into->mark->getFace());
+							auto created = target->universe->addEdge(from->mark, into->mark);
+
+							if (getPointRelation(*created->getFace(),into->mid).type != FaceRelationType::point_exterior) {
+								into->mark = created;
 							}
-							exteriors.push(into->mark->getInv()->getFace());
+
+							if (!interiors.contains(created->getFace())) {
+								interiors.push(created->getFace());
+							}
+							exteriors.push(created->getInv()->getFace());
 						}
 					}
 					else {
-						exteriors.remove(from->mark->getFace());
+						exteriors.remove(into->mark->getFace());
 
 						into->mark = target->universe->addEdge(from->mark, into->mark);
 					}
