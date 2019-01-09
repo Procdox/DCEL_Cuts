@@ -416,10 +416,10 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 		from->type = FaceRelationType::point_on_boundary;
 
 		++last;
-		next = last.cyclic_next();
 	}
 
-	while (*last != nullptr) {
+	while (last != details.end()) {
+		next = last.cyclic_next();
 
 		auto into = *next;
 		auto from = *last;
@@ -461,7 +461,6 @@ void determineInteriors(Region * target, FLL<interact *> & details,
 		}
 
 		++last;
-		next = last.cyclic_next();
 	}
 
 	//does the entire boundary lie on a loop

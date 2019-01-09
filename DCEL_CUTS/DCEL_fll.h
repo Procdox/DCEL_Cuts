@@ -64,14 +64,14 @@ public:
 		}
 
 		FLL_iterator next() const {
-			return FLL_iterator(relevant, focus->next->next);
+			return FLL_iterator(relevant, focus->next);
 		}
 		FLL_iterator cyclic_next() const {
 			if (focus->next == nullptr) {
-				return FLL_iterator(relevant, relevant->head->next);
+				return FLL_iterator(relevant, relevant->head);
 			}
 			else {
-				return FLL_iterator(relevant, focus->next->next);
+				return FLL_iterator(relevant, focus->next);
 			}
 		}
 	};
@@ -108,14 +108,14 @@ public:
 		}
 
 		FLL_iterator_c next() const {
-			return FLL_iterator_c(relevant, focus->next->next);
+			return FLL_iterator_c(relevant, focus->next);
 		}
 		FLL_iterator_c cyclic_next() const {
 			if (focus->next == nullptr) {
-				return FLL_iterator_c(relevant, relevant->head->next);
+				return FLL_iterator_c(relevant, relevant->head);
 			}
 			else {
-				return FLL_iterator_c(relevant, focus->next->next);
+				return FLL_iterator_c(relevant, focus->next);
 			}
 		}
 	};
