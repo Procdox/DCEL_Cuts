@@ -50,4 +50,6 @@ public:
 	bool operator>=(const rto &test) const;
 	bool operator<=(const int &test) const;
 	bool operator<=(const rto &test) const;
+
+	float toFloat() const;
 };

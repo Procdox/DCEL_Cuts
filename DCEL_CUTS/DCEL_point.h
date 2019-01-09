@@ -20,6 +20,9 @@ struct Pint {
 
 	Pint();
 	Pint(rto x, rto y);
+	//Pint(Pint &&target);
+	//Pint(Pint const &target);
+	//Pint & operator=(Pint const & target);
 
 	Pint operator+(const Pint &target) const;
 	Pint operator-(const Pint &target) const;

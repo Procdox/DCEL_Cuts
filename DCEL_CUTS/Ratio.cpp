@@ -370,3 +370,8 @@ bool rto::operator<=(const rto & test) const
 {
 	return n * test.d <= test.n * d;
 }
+
+float rto::toFloat() const
+{
+	return (float)n / (float)d;
+}

@@ -10,44 +10,117 @@ template <class _T>
 class FLL;
 
 template <class _T>
-class node {
-	friend FLL<_T>;
-
-	_T value;
-	node* next;
-	node(_T v, node* n) {
-		value = v;
-		next = n;
-	};
-
-	//nodes should NEVER be copied or moved, they are purely internal to the creating list
-	node(node&&) = delete;
-	node(const node&) = delete;
-public:
-	_T getValue() const {
-		return value;
-	};
-
-	void setValue(_T v) {
-		value = v;
-	};
-
-	node* getNext() {
-		return next;
-	};
-	const node* getNext() const {
-		return next;
-	};
-};
-
-template <class _T>
 class FLL {
+	struct FLL_node {
 
-	node<_T>* head;
-	node<_T>* tail;
+		_T value;
+		FLL_node * next;
+		FLL_node(_T v, FLL_node * n) {
+			value = v;
+			next = n;
+		};
+
+		//nodes should NEVER be copied or moved, they are purely internal to the creating list
+		FLL_node(FLL_node &&) = delete;
+		FLL_node(const FLL_node &) = delete;
+	};
+
+	FLL_node * head;
+	FLL_node * tail;
 	int length;
 
 public:
+
+	class FLL_iterator {
+		FLL * relevant;
+		FLL_node * focus;
+
+	public:
+		FLL_iterator(FLL * r, FLL_node * v) {
+			relevant = r;
+			focus = v;
+		}
+		FLL_iterator & operator=(FLL_iterator const & target) {
+			relevant = target.relevant;
+			focus = target.focus;
+
+			return *this;
+		}
+
+		FLL_iterator & operator++() {
+			focus = focus->next;
+
+			return *this;
+		}
+		bool operator!=(FLL_iterator const & target) const {
+			return focus != target.focus;
+		}
+
+		_T & operator*() const {
+			return focus->value;
+		}
+		_T & operator->() const {
+			return focus->value;
+		}
+
+		FLL_iterator next() const {
+			return FLL_iterator(relevant, focus->next->next);
+		}
+		FLL_iterator cyclic_next() const {
+			if (focus->next == nullptr) {
+				return FLL_iterator(relevant, relevant->head->next);
+			}
+			else {
+				return FLL_iterator(relevant, focus->next->next);
+			}
+		}
+	};
+
+	class FLL_iterator_c {
+		FLL const * relevant;
+		FLL_node const * focus;
+
+	public:
+		FLL_iterator_c(FLL const * r, FLL_node const * v) {
+			relevant = r;
+			focus = v;
+		}
+		FLL_iterator_c & operator=(FLL_iterator_c const & target) {
+			relevant = target.relevant;
+			focus = target.focus;
+			return *this;
+		}
+
+		FLL_iterator_c & operator++() {
+			focus = focus->next;
+
+			return *this;
+		}
+		bool operator!=(FLL_iterator_c const & target) const {
+			return focus != target.focus;
+		}
+
+		_T const & operator*() const {
+			return focus->value;
+		}
+		_T const & operator->() const {
+			return focus->value;
+		}
+
+		FLL_iterator_c next() const {
+			return FLL_iterator_c(relevant, focus->next->next);
+		}
+		FLL_iterator_c cyclic_next() const {
+			if (focus->next == nullptr) {
+				return FLL_iterator_c(relevant, relevant->head->next);
+			}
+			else {
+				return FLL_iterator_c(relevant, focus->next->next);
+			}
+		}
+	};
+
+
 	FLL() {
 		head = nullptr;
 		tail = nullptr;
@@ -56,7 +129,7 @@ public:
 	~FLL() {
 		clear();
 	};
-	FLL(FLL<_T> &&refernce) {
+	FLL(FLL<_T> && refernce) {
 		head = refernce.head;
 		tail = refernce.tail;
 		length = refernce.length;
@@ -66,8 +139,8 @@ public:
 		refernce.length = 0;
 
 	}
-	FLL(FLL<_T> const &reference) {
-		node<_T> * focus = reference.head;
+	FLL(FLL<_T> const & reference) {
+		FLL_node * focus = reference.head;
 		head = nullptr;
 		tail = nullptr;
 		length = 0;
@@ -79,8 +152,8 @@ public:
 		}
 	};
 
-	FLL<_T> & operator=(FLL<_T> const &reference) {
-		node<_T> * focus = reference.head;
+	FLL<_T> & operator=(FLL<_T> const & reference) {
+		FLL_node * focus = reference.head;
 		head = nullptr;
 		tail = nullptr;
 		length = 0;
@@ -95,7 +168,7 @@ public:
 	};
 
 	void push(_T value) {
-		head = new node<_T>(value, head);
+		head = new FLL_node(value, head);
 
 		if (tail == nullptr) tail = head;
 
@@ -104,11 +177,11 @@ public:
 
 	void append(_T value) {
 		if (head != nullptr) {
-			tail->next = new node<_T>(value, nullptr);
+			tail->next = new FLL_node(value, nullptr);
 			tail = tail->next;
 		}
 		else {
-			head = new node<_T>(value, nullptr);
+			head = new FLL_node(value, nullptr);
 			tail = head;
 		}
 
@@ -118,7 +191,7 @@ public:
 	//returns the element at head, undefined behavior if empty
 	_T pop() {
 		_T product = head->value;
-		node<_T> * to_be = head->next;
+		FLL_node * to_be = head->next;
 
 		delete head;
 
@@ -137,7 +210,7 @@ public:
 		return head == nullptr;
 	}
 	bool contains(_T search) const {
-		node<_T>* focus = head;
+		FLL_node* focus = head;
 
 		while (focus != nullptr) {
 			if (focus->value == search) return true;
@@ -147,24 +220,42 @@ public:
 		return false;
 	};
 
-	node<_T>* getHead() {
+	/*FLL_node * getHead() {
 		return head;
 	};
-	node<_T> const * getHead() const {
+	FLL_node const * getHead() const {
 		return head;
 	};
 
-	node<_T>* getTail() {
+	FLL_node * getTail() {
 		return tail;
 	};
-	node<_T> const * getTail() const {
+	FLL_node const * getTail() const {
 		return tail;
-	};
+	};*/
+
+	FLL_iterator begin() {
+		return FLL_iterator(this, head);
+	}
+	FLL_iterator end() {
+		return FLL_iterator(this, nullptr);
+	}
+
+	FLL_iterator_c begin() const {
+		return FLL_iterator_c(this, head);
+	}
+	FLL_iterator_c end() const {
+		return FLL_iterator_c(this, nullptr);
+	}
+
+	_T last() const {
+		return tail->value;
+	}
 
 	FLL<_T> reverse() const {
 		FLL<_T> product;
 
-		node<_T>* focus = head;
+		FLL_node * focus = head;
 
 		while (focus != nullptr) {
 			product.push(focus->value);
@@ -175,8 +266,8 @@ public:
 	}
 
 	bool remove(_T search) {
-		node<_T>* focus = head;
-		node<_T>* after;
+		FLL_node * focus = head;
+		FLL_node * after;
 
 		//special cases
 
@@ -214,8 +305,8 @@ public:
 	};
 
 	int removeAll(_T search) {
-		node<_T>* focus = head;
-		node<_T>* after;
+		FLL_node * focus = head;
+		FLL_node * after;
 		int count = 0;
 
 		//special cases
@@ -262,7 +353,7 @@ public:
 	};
 
 	//appends the target list, and empties it
-	void absorb(FLL<_T> &target) {
+	void absorb(FLL<_T> & target) {
 		if (target.head != nullptr) {
 
 			if (head == nullptr) {
@@ -283,7 +374,7 @@ public:
 	}
 
 	int size() const {
-		node<_T>* focus = head;
+		FLL_node * focus = head;
 		int s = 0;
 		
 		while (focus != nullptr) {
@@ -299,15 +390,15 @@ public:
 	}
 
 	void qInsert(_T value, bool (*compare)(_T, _T)) {
-		node<_T> * focus = head;
-		node<_T> * after;
+		FLL_node * focus = head;
+		FLL_node * after;
 
 		if (head == nullptr) {
 			push(value);
 			return;
 		}
 
-		if (compare(head->getValue(), value)) {
+		if (compare(head->value, value)) {
 			push(value);
 			return;
 		}
@@ -315,9 +406,9 @@ public:
 		after = head->next;
 		
 		while (after != nullptr) {
-			if (compare(after->getValue(), value)) {
+			if (compare(after->value, value)) {
 
-				focus->next = new node<_T>(value, after);
+				focus->next = new FLL_node(value, after);
 				length++;
 				return;
 			}
@@ -342,14 +433,14 @@ public:
 		length = 0;
 	};
 
-	node<_T>* operator[](int index) {
-		node<_T>* focus = head;
+	_T operator[](int index) {
+		FLL_node * focus = head;
 
 		while (focus != nullptr && index > 0) {
 			focus = focus->next;
 			index-=1;
 		}
 
-		return focus;
+		return focus->value;
 	}
 };

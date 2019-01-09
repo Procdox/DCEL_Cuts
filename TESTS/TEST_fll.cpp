@@ -43,7 +43,7 @@ TEST(FLL_Tests, append_and_pop) {
 	EXPECT_EQ(kk, 9);
 }
 
-TEST(FLL_Tests, push_and_iterate) {
+TEST(FLL_Tests, push_and_iterator) {
 	int list[] = { 4, 7, 2, 4, 7, 9, 0, 3, 1 };
 
 	FLL<int> test_object;
@@ -52,20 +52,16 @@ TEST(FLL_Tests, push_and_iterate) {
 		test_object.push(list[kk]);
 	}
 
-	auto focus = test_object.getHead();
 	int kk = 0;
+	for(auto focus : test_object){
 
-	while(focus != nullptr){
-
-		EXPECT_EQ(list[8 - kk++], focus->getValue());
-
-		focus = focus->getNext();
+		EXPECT_EQ(list[8 - kk++], focus);
 	}
 
 	EXPECT_EQ(kk, 9);
 }
 
-TEST(FLL_Tests, append_and_iterate) {
+TEST(FLL_Tests, append_and_iterator) {
 	int list[] = { 4, 7, 2, 4, 7, 9, 0, 3, 1 };
 
 	FLL<int> test_object;
@@ -74,20 +70,17 @@ TEST(FLL_Tests, append_and_iterate) {
 		test_object.append(list[kk]);
 	}
 
-	auto focus = test_object.getHead();
 	int kk = 0;
 
-	while (focus != nullptr) {
+	for(auto focus : test_object) {
 
-		EXPECT_EQ(list[kk++], focus->getValue());
-
-		focus = focus->getNext();
+		EXPECT_EQ(list[kk++], focus);
 	}
 
 	EXPECT_EQ(kk, 9);
 }
 
-TEST(FLL_Tests, push_and_tail) {
+TEST(FLL_Tests, push_and_last) {
 	int list[] = { 4, 7, 2, 4, 7, 9, 0, 3, 1 };
 
 	FLL<int> test_object;
@@ -96,7 +89,7 @@ TEST(FLL_Tests, push_and_tail) {
 		test_object.push(list[kk]);
 	}
 
-	EXPECT_EQ(test_object.getTail()->getValue(), 4);
+	EXPECT_EQ(test_object.last(), 4);
 }
 
 TEST(FLL_Tests, empty) {
@@ -126,14 +119,11 @@ TEST(FLL_Tests, remove) {
 
 	EXPECT_TRUE(test_object.remove(7));
 
-	auto focus = test_object.getHead();
 	int kk = 0;
 
-	while (focus != nullptr) {
+	for(auto focus : test_object) {
 
-		EXPECT_EQ(result[kk++], focus->getValue());
-
-		focus = focus->getNext();
+		EXPECT_EQ(result[kk++], focus);
 	}
 
 	EXPECT_EQ(kk, 8);
@@ -186,14 +176,12 @@ TEST(FLL_Tests, remove_all) {
 
 	EXPECT_EQ(test_object.removeAll(7),2);
 
-	auto focus = test_object.getHead();
 	int kk = 0;
 
-	while (focus != nullptr) {
+	for(auto focus : test_object) {
 
-		EXPECT_EQ(result[kk++], focus->getValue());
+		EXPECT_EQ(result[kk++], focus);
 
-		focus = focus->getNext();
 	}
 
 	EXPECT_EQ(kk, 7);
@@ -212,14 +200,12 @@ TEST(FLL_Tests, absorb_empty) {
 
 	object_a.absorb(object_b);
 
-	auto focus = object_a.getHead();
 	int kk = 0;
 
-	while (focus != nullptr) {
+	for(auto focus : object_a) {
 
-		EXPECT_EQ(result[kk++], focus->getValue());
+		EXPECT_EQ(result[kk++], focus);
 
-		focus = focus->getNext();
 	}
 
 	EXPECT_EQ(kk, 4);
@@ -239,14 +225,12 @@ TEST(FLL_Tests, absorb_to_empty) {
 
 	object_a.absorb(object_b);
 
-	auto focus = object_a.getHead();
 	int kk = 0;
 
-	while (focus != nullptr) {
+	for (auto focus : object_a) {
 
-		EXPECT_EQ(result[kk++], focus->getValue());
+		EXPECT_EQ(result[kk++], focus);
 
-		focus = focus->getNext();
 	}
 
 	EXPECT_EQ(kk, 4);
@@ -280,14 +264,12 @@ TEST(FLL_Tests, absorb) {
 
 	object_a.absorb(object_b);
 
-	auto focus = object_a.getHead();
 	int kk = 0;
 
-	while (focus != nullptr) {
+	for (auto focus : object_a) {
 
-		EXPECT_EQ(result[kk++], focus->getValue());
+		EXPECT_EQ(result[kk++], focus);
 
-		focus = focus->getNext();
 	}
 
 	EXPECT_EQ(kk, 8);

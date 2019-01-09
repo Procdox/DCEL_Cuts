@@ -61,24 +61,20 @@ public:
 	Region(DCEL<Pint> *, FLL<Pint> const &);
 	Region(DCEL<Pint> *, Face<Pint> *);
 
-	FLL< Face<Pint> *> const * getBounds() {
+	FLL< Face<Pint> *> const * getBounds() const {
 		return &Boundaries;
 	}
 
 	//returns nullptr if out of bounds
 	Face<Pint> * operator[](int index) {
-		auto ref = Boundaries[index];
-		if (ref == nullptr) {
-			throw "region boundary index DNE!";
-		}
-		return ref->getValue();
+		return Boundaries[index];
 	}
 
 	int size() const {
 		return Boundaries.size();
 	}
 
-	FaceRelation contains(Pint const &test_point);
+	FaceRelation contains(Pint const & test_point) ;
 
 	//if non-trivially connected, will absorb the target region into this one via face merging
 	bool merge(Region*);

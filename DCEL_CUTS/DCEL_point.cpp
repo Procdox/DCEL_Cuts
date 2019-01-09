@@ -183,41 +183,20 @@ bool Pint::getIntersect(const Pint &A_S, const Pint &A_E, const Pint &B_S, const
 	return false;
 }
 
-rto Pint::area(FLL<Pint> const &boundary) {
-	auto focus = boundary.getHead();
-
-	if (focus == nullptr) {
-		return 0;
-	}
-
-	auto next = focus->getNext();
-
-	if (next == nullptr) {
-		return 0;
-	}
-
+rto Pint::area(FLL<Pint> const & boundary) {
 	rto total = 0;
 
-	do {
-		Pint A = focus->getValue();
-		Pint B = next->getValue();
+	Pint A = boundary.last();
+
+	for(auto B : boundary){
 
 		rto width = B.X - A.X;
 		rto avg_height = (A.Y + B.Y) / 2;
 
 		total += width * avg_height;
 
-		focus = next;
-		next = next->getNext();
-	} while (next != nullptr);
-
-	Pint A = focus->getValue();
-	Pint B = boundary.getHead()->getValue();
-
-	rto width = B.X - A.X;
-	rto avg_height = (A.Y + B.Y) / 2;
-
-	total += width * avg_height;
+		A = B;
+	}
 
 	return total;
 }

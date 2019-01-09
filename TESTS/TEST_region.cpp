@@ -175,8 +175,8 @@ TEST(Face_Cuts, Hole) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -276,8 +276,8 @@ TEST(Face_Cuts, Edge_Meeting_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -370,8 +370,8 @@ TEST(Face_Cuts, Point_Meeting_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -463,8 +463,8 @@ TEST(Face_Cuts, Matching_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -557,8 +557,8 @@ TEST(Face_Cuts, Before_Overlapping_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -650,8 +650,8 @@ TEST(Face_Cuts, After_Overlapping_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -742,8 +742,8 @@ TEST(Face_Cuts, Overlapping_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -827,7 +827,7 @@ TEST(Face_Cuts, Stacked_Holes) {
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
-		subAllocate(exterior_med[0]->getValue(), boundary_small_b, exterior, interior);
+		subAllocate(exterior_med[0], boundary_small_b, exterior, interior);
 	}
 	
 	//testing
@@ -843,9 +843,9 @@ TEST(Face_Cuts, Stacked_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -952,9 +952,9 @@ TEST(Face_Cuts, Horshoe_Cut) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1056,8 +1056,8 @@ TEST(Face_Cuts, Corner_Meeting_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -1144,8 +1144,8 @@ TEST(Face_Cuts, Edge_Crossing_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -1232,8 +1232,8 @@ TEST(Face_Cuts, Corner_Crossing_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -1366,7 +1366,7 @@ TEST(Face_Cuts, Encapsulating_Cut) {
 
 	ASSERT_NE(interior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
+	Region * interior_0 = interior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 
@@ -1438,7 +1438,7 @@ TEST(Face_Cuts, Seperate_Holes) {
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
-		subAllocate(exterior_med[0]->getValue(), boundary_small_b, exterior, interior);
+		subAllocate(exterior_med[0], boundary_small_b, exterior, interior);
 	}
 
 	//testing
@@ -1454,9 +1454,9 @@ TEST(Face_Cuts, Seperate_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1583,7 +1583,7 @@ TEST(Face_Cuts, Adjacent_Meeting_Holes) {
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
-		subAllocate(exterior_med[0]->getValue(), boundary_small_b, exterior, interior);
+		subAllocate(exterior_med[0], boundary_small_b, exterior, interior);
 	}
 
 	//testing
@@ -1599,9 +1599,9 @@ TEST(Face_Cuts, Adjacent_Meeting_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1711,7 +1711,7 @@ TEST(Face_Cuts, Adjacent_Crossing_Holes) {
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
-		subAllocate(exterior_med[0]->getValue(), boundary_small_b, exterior, interior);
+		subAllocate(exterior_med[0], boundary_small_b, exterior, interior);
 	}
 
 	EXPECT_EQ(space.pointCount(), 12);
@@ -1725,9 +1725,9 @@ TEST(Face_Cuts, Adjacent_Crossing_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1837,7 +1837,7 @@ TEST(Face_Cuts, Connecting_Holes) {
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
-		subAllocate(exterior_med[0]->getValue(), boundary_small_b, exterior, interior);
+		subAllocate(exterior_med[0], boundary_small_b, exterior, interior);
 	}
 
 	//testing
@@ -1853,9 +1853,9 @@ TEST(Face_Cuts, Connecting_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1960,9 +1960,9 @@ TEST(Face_Cuts, Connecting_Several_Holes) {
 
 		subAllocate(product, boundary_small_a, exterior_med_a, interior);
 
-		subAllocate(exterior_med_a[0]->getValue(), boundary_small_b, exterior_med_b, interior);
+		subAllocate(exterior_med_a[0], boundary_small_b, exterior_med_b, interior);
 
-		subAllocate(exterior_med_b[0]->getValue(), boundary_small_c, exterior, interior);
+		subAllocate(exterior_med_b[0], boundary_small_c, exterior, interior);
 	}
 
 	//testing
@@ -1999,10 +1999,10 @@ TEST(Face_Cuts, Connecting_Several_Holes) {
 	ASSERT_NE(interior[2], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * interior_2 = interior[2]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * interior_2 = interior[2];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -2136,9 +2136,9 @@ TEST(Face_Cuts, Splitting_Cut) {
 	ASSERT_NE(exterior[0], nullptr);
 	ASSERT_NE(exterior[1], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
-	Region * exterior_1 = exterior[1]->getValue();
+	Region * interior_0 = interior[0];
+	Region * exterior_0 = exterior[0];
+	Region * exterior_1 = exterior[1];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -2235,7 +2235,7 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
-		subAllocate(exterior_med[0]->getValue(), boundary_small_b, exterior, interior);
+		subAllocate(exterior_med[0], boundary_small_b, exterior, interior);
 	}
 
 	//testing
@@ -2252,10 +2252,10 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 	ASSERT_NE(interior[2], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * interior_2 = interior[2]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * interior_2 = interior[2];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -2390,9 +2390,9 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -2491,7 +2491,7 @@ TEST(Face_Cuts, Divided_Meet_Cut) {
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
-		subAllocate(exterior_med[0]->getValue(), boundary_small_b, exterior, interior);
+		subAllocate(exterior_med[0], boundary_small_b, exterior, interior);
 	}
 
 	//testing
@@ -2508,10 +2508,10 @@ TEST(Face_Cuts, Divided_Meet_Cut) {
 	ASSERT_NE(interior[2], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0]->getValue();
-	Region * interior_1 = interior[1]->getValue();
-	Region * interior_2 = interior[2]->getValue();
-	Region * exterior_0 = exterior[0]->getValue();
+	Region * interior_0 = interior[0];
+	Region * interior_1 = interior[1];
+	Region * interior_2 = interior[2];
+	Region * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);

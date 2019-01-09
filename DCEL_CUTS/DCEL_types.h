@@ -537,6 +537,19 @@ public:
 		return target;
 	}
 
+	FLL<Edge<_P> const *> getLoopEdges() const {
+		Edge<_P> * focus = root;
+		FLL<Edge<_P> *> target;
+
+		do {
+			target.append(focus);
+
+			focus = focus->next;
+		} while (focus != root);
+
+		return target;
+	}
+
 	//return a list of the faces that share a boundary in the loop
 	FLL<Face<_P> const *> getNeighbors() const {
 		FLL<Face<_P> const *> target;
@@ -693,25 +706,16 @@ class DCEL {
 
 public:
 	~DCEL() {
-		auto focus_point = points.getHead();
-
-		while (focus_point != nullptr) {
-			delete focus_point->getValue();
-			focus_point = focus_point->getNext();
+		for(auto focus_point : points) {
+			delete focus_point;
 		}
 
-		auto focus_edge = edges.getHead();
-
-		while (focus_edge != nullptr) {
-			delete focus_edge->getValue();
-			focus_edge = focus_edge->getNext();
+		for (auto focus_edge : edges) {
+			delete focus_edge;
 		}
 
-		auto focus_face = faces.getHead();
-
-		while (focus_face != nullptr) {
-			delete focus_face->getValue();
-			focus_face = focus_face->getNext();
+		for (auto focus_face : faces) {
+			delete focus_face;
 		}
 	}
 
@@ -820,19 +824,19 @@ public:
 	//creates a circular chain of edges forming a loop with the given boundary
 	//returns a pointer to the clock-wise oriented interior of the boundary
 	Face<_P> * draw(FLL<_P> const &boundary) {
-		auto track = boundary.getHead();
+		auto track = boundary.begin();
 
-		_P a = track->getValue();
-		track = track->getNext();
-		_P b = track->getValue();
-		track = track->getNext();
+		_P a = *track;
+		++track;
+		_P b = *track;
+		++track;
 
 		Edge<_P> * start = addEdge(a, b);
 		Edge<_P> * strand = start;
 
-		while (track != nullptr) {
-			b = track->getValue();
-			track = track->getNext();
+		while (track != boundary.end()) {
+			b = *track;
+			++track;
 
 			strand = addEdge(strand, b);
 		}
