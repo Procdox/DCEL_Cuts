@@ -578,3 +578,43 @@ void subAllocate(Region * target, FLL<Pint> const & boundary,
 		delete target;
 	}
 }
+
+void Region::clean() {
+	for (auto border : Boundaries) {
+		auto og_root = border->getRoot();
+		auto focus = og_root;
+
+		while(true) {
+			auto next = focus->getNext();
+			
+			// mid point degree is two test
+			if (focus->getInv()->getLast() == next->getInv()) {
+
+				bool parallel = false;
+
+				// parallel test
+				Pint a = focus->getEnd()->getPosition() - focus->getStart()->getPosition();
+				Pint b = next->getEnd()->getPosition() - next->getStart()->getPosition();
+
+				if (a.Y != 0 && b.Y != 0) {
+					rto x = a.X / a.Y;
+					rto y = b.X / b.Y;
+					parallel = x == y;
+				}
+				else if (a.Y == 0 && b.Y == 0) {
+					parallel = true;
+				}
+
+				if (parallel) {
+					next->getInv()->contract();
+				}
+			}
+
+			if (next == og_root) {
+				break;
+			}
+
+			focus = focus->getNext();
+		}
+	}
+}
