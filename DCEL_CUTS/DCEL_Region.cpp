@@ -64,9 +64,9 @@ FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_
 	rto best_distance = 0;
 	bool inside = Pint::area(rel) < 0;
 
-	Pint end_vector = rel.last();
-
-	for(auto start_vector : rel){
+	for (auto start = rel.begin(); start != rel.end(); ++start) {
+		Pint start_vector = *start;
+		Pint end_vector = *start.cyclic_next();
 
 		//does it sit on
 		rto y_length = end_vector.Y - start_vector.Y;
@@ -98,8 +98,6 @@ FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_
 				inside = y_length > 0;
 			}
 		}
-
-		end_vector = start_vector;
 	}
 
 	if (inside) {
