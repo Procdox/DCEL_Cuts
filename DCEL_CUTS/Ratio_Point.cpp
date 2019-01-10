@@ -1,4 +1,4 @@
-#include "DCEL_Point.h"
+#include "Ratio_Point.h"
 
 Pint::Pint() {
 	X = 0;
