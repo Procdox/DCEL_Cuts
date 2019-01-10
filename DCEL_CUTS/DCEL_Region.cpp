@@ -506,7 +506,7 @@ void subAllocate(Region * target, FLL<Pint> const & boundary,
 	else {
 		determineInteriors(target, details, exterior_faces, interior_faces);
 
-		//find regions, place holes
+	//find regions, place holes
 
 	//determine clockwise faces
 	//determine clockwise containment tree

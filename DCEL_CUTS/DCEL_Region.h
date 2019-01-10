@@ -79,7 +79,7 @@ public:
 	//if non-trivially connected, will absorb the target region into this one via face merging
 	bool merge(Region*);
 
-	//merges parrallel adjacent edges who's mid point has a degree of just 2
+	//merges parrallel adjacent edges who's mid point has a degree of just two
 	void clean();
 
 };
