@@ -29,22 +29,24 @@ FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
 			focus = focus->getNext();
 			continue;
 		}
-		else if ((y_offset <= y_length && y_offset >= 0) || y_offset >= y_length && y_offset <= 0) {
-			rto x_length = end_vector.X - start_vector.X;
+		else{
+			rto ratio = y_offset / y_length;
+			if (ratio <= 1 && ratio >= 0) {
+				rto x_length = end_vector.X - start_vector.X;
 
-			rto x = start_vector.X + (x_length * y_offset) / y_length;
-			rto distance = test_point.X - x;
+				rto x = start_vector.X + x_length * ratio;
+				rto distance = test_point.X - x;
 
-			if (distance == 0) {
-				return FaceRelation(FaceRelationType::point_on_boundary, focus);
+				if (distance == 0) {
+					return FaceRelation(FaceRelationType::point_on_boundary, focus);
+				}
+				else if (distance > 0 && (distance < best_distance || !is_best)) {
+					is_best = true;
+					best_distance = distance;
+
+					inside = y_length > 0;
+				}
 			}
-			else if (distance > 0 && (distance < best_distance || !is_best)) {
-				is_best = true;
-				best_distance = distance;
-
-				inside = y_length > 0;
-			}
-
 		}
 		focus = focus->getNext();
 	} while (focus != rel.getRoot());
@@ -82,20 +84,23 @@ FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_
 			}
 			continue;
 		}
-		else if ((y_offset <= y_length && y_offset >= 0) || y_offset >= y_length && y_offset <= 0) {
-			rto x_length = end_vector.X - start_vector.X;
+		else {
+			rto ratio = y_offset / y_length;
+			if (ratio <= 1 && ratio >= 0) {
+				rto x_length = end_vector.X - start_vector.X;
 
-			rto x = start_vector.X + (x_length * y_offset) / y_length;
-			rto distance = test_point.X - x;
+				rto x = start_vector.X + x_length * ratio;
+				rto distance = test_point.X - x;
 
-			if (distance == 0) {
-				return FaceRelationType::point_on_boundary;
-			}
-			else if (distance > 0 && (distance < best_distance || !is_best)) {
-				is_best = true;
-				best_distance = distance;
+				if (distance == 0) {
+					return FaceRelationType::point_on_boundary;
+				}
+				else if (distance > 0 && (distance < best_distance || !is_best)) {
+					is_best = true;
+					best_distance = distance;
 
-				inside = y_length > 0;
+					inside = y_length > 0;
+				}
 			}
 		}
 	}
