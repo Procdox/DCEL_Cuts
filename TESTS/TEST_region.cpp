@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "..\DCEL_CUTS\DCEL_Region.h"
+#include "..\DCEL_CUTS\Ratio_Region.h"
 
 TEST(Region_Basics, Region_Creation) {
 

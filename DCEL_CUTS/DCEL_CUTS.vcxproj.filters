@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="DCEL_Region.cpp">
-      <Filter>private</Filter>
-    </ClCompile>
     <ClCompile Include="Ratio.cpp">
       <Filter>private</Filter>
     </ClCompile>
@@ -13,17 +10,11 @@
     <ClCompile Include="Ratio_Offsets.cpp">
       <Filter>private</Filter>
     </ClCompile>
+    <ClCompile Include="Ratio_Region.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DCEL_fll.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="DCEL_types.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="DCEL_Region.h">
-      <Filter>public</Filter>
-    </ClInclude>
     <ClInclude Include="Ratio.h">
       <Filter>public</Filter>
     </ClInclude>
@@ -31,6 +22,15 @@
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="Ratio_Point.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="DCEL.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="FLL.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="Ratio_Region.h">
       <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>
