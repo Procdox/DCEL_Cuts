@@ -37,6 +37,10 @@ class Point {
 	};
 	Point(Point<_P> &&) = delete;
 	Point(Point<_P> const &) = delete;
+
+	~Point() {
+
+	}
 public:
 	void setPosition(_P p) {
 		position = p;
@@ -102,6 +106,10 @@ class Edge {
 	}
 	Edge(Edge<_P> &&) = delete;
 	Edge(Edge<_P> const &) = delete;
+
+	~Edge() {
+
+	}
 public:
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	//         Traversal Methods
@@ -483,6 +491,10 @@ class Face {
 	Face(Face<_P> &&) = delete;
 	Face(Face<_P> const &) = delete;
 
+	~Face() {
+
+	}
+
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	//         Modifiers
 	//sets all edges of this loop to reference this
@@ -659,8 +671,6 @@ public:
 		}
 		return product;
 	}
-
-	//void cleanBorder();
 };
 
 template <class _P>
@@ -671,6 +681,9 @@ class Region {
 
 	Region(DCEL<Pint> * uni) {
 		universe = uni;
+	}
+	~Region() {
+
 	}
 	FLL<Face<_P> *> Boundaries;
 
