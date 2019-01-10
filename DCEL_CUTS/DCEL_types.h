@@ -779,13 +779,6 @@ class DCEL {
 
 		delete target;
 	}
-	//removes a region
-	//does NOT check to see if referenced elsewhere
-	void removeFace(Region<_P> * target) {
-		regions.remove(target);
-
-		delete target;
-	}
 
 public:
 	~DCEL() {
@@ -814,6 +807,9 @@ public:
 	}
 	int faceCount() const {
 		return faces.size();
+	}
+	int regionCount() const {
+		return regions.size();
 	}
 
 	//creates an edge and its inverse connecting two novel points
@@ -953,6 +949,11 @@ public:
 		return start->loop;
 	}
 
+	//removes a region
+	//does NOT check to see if referenced elsewhere
+	void removeRegion(Region<_P> * target) {
+		regions.remove(target);
 
-	//void sanityCheck(); TODO
+		delete target;
+	}
 };

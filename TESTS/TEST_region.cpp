@@ -168,6 +168,7 @@ TEST(Face_Cuts, Hole) {
 	EXPECT_EQ(space.pointCount(), 8);
 	EXPECT_EQ(space.edgeCount(), 16);
 	EXPECT_EQ(space.faceCount(), 4);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -216,15 +217,15 @@ TEST(Face_Cuts, Hole) {
 
 	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(interior_0_0));
 	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(exterior_0_1));
-	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(null_0));
+	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(null_0));
 
 	EXPECT_TRUE(exterior_0_1->getNeighbors().contains(interior_0_0));
 	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(exterior_0_0));
-	EXPECT_TRUE(exterior_0_1->getNeighbors().contains(null_0));
+	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(null_0));
 
 	EXPECT_FALSE(null_0->getNeighbors().contains(interior_0_0));
-	EXPECT_FALSE(null_0->getNeighbors().contains(exterior_0_0));
-	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_1));
+	EXPECT_TRUE(null_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_FALSE(null_0->getNeighbors().contains(exterior_0_1));
 }
 
 

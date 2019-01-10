@@ -559,7 +559,7 @@ void subAllocate(Region<Pint> * target, FLL<Pint> const & boundary,
 			exteriors.push(novel);
 		}
 
-		delete target;
+		target->getUni()->removeRegion(target);
 	}
 }
 
