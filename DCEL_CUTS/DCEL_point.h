@@ -76,10 +76,10 @@ struct PBox {
 	Pint Min;
 	Pint Max;
 
-	Pint getExtent() {
+	Pint getExtent() const {
 		return (Max - Min) / 2;
 	}
-	Pint getCenter() {
+	Pint getCenter() const {
 		return (Max + Min) / 2;
 	}
 };
