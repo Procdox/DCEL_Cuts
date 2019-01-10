@@ -693,7 +693,7 @@ public:
 			}
 
 			border->group = this;
-			Boundaries.append(border);
+			Boundaries.push(border);
 		}
 	}
 	void remove(Face<Pint> * border) {
