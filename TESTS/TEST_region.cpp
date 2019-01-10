@@ -7,7 +7,7 @@ TEST(Region_Basics, Region_Creation) {
 	DCEL<Pint> space;
 
 	//results
-	Region * product, * null;
+	Region<Pint> * product, * null;
 
 	//tested operations are performed within this block
 	{
@@ -19,11 +19,11 @@ TEST(Region_Basics, Region_Creation) {
 			boundary_big.append(Pint(20, 0));
 		}
 
-		product = new Region(&space, boundary_big);
+		product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 	}
 
 	//testing
@@ -114,16 +114,16 @@ TEST(Region_Basics, Region_Contains) {
 		boundary_big.append(Pint(20, 0));
 	}
 
-	Region * target = new Region(&space, boundary_big);
+	auto product = space.region(boundary_big);
 
 	//inside simple
-	EXPECT_EQ(target->contains(Pint(2,2)).type, FaceRelationType::point_interior);
+	EXPECT_EQ(contains(product, Pint(2,2)).type, FaceRelationType::point_interior);
 
 	//outside simple
-	EXPECT_EQ(target->contains(Pint(-2, 2)).type, FaceRelationType::point_exterior);
+	EXPECT_EQ(contains(product, Pint(-2, 2)).type, FaceRelationType::point_exterior);
 
 	//boundary simple
-	EXPECT_EQ(target->contains(Pint(0, 2)).type, FaceRelationType::point_on_boundary);
+	EXPECT_EQ(contains(product, Pint(0, 2)).type, FaceRelationType::point_on_boundary);
 }
 
 
@@ -133,9 +133,9 @@ TEST(Face_Cuts, Hole) {
 	DCEL<Pint> space;
 	
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -154,11 +154,11 @@ TEST(Face_Cuts, Hole) {
 			boundary_small_a.append(Pint(4, 2));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -175,8 +175,8 @@ TEST(Face_Cuts, Hole) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -206,19 +206,19 @@ TEST(Face_Cuts, Hole) {
 	auto area_null_0 = Pint::area(null_0->getLoopPoints());
 
 	EXPECT_TRUE(area_in_0_0 == rto(4));
-	EXPECT_TRUE(area_ex_0_0 == rto(-4));
-	EXPECT_TRUE(area_ex_0_1 == rto(400));
+	EXPECT_TRUE(area_ex_0_0 == rto(400));
+	EXPECT_TRUE(area_ex_0_1 == rto(-4));
 	EXPECT_TRUE(area_null_0 == rto(-400));
 
-	EXPECT_TRUE(interior_0_0->getNeighbors().contains(exterior_0_0));
-	EXPECT_FALSE(interior_0_0->getNeighbors().contains(exterior_0_1));
+	EXPECT_FALSE(interior_0_0->getNeighbors().contains(exterior_0_0));
+	EXPECT_TRUE(interior_0_0->getNeighbors().contains(exterior_0_1));
 	EXPECT_FALSE(interior_0_0->getNeighbors().contains(null_0));
 
-	EXPECT_TRUE(exterior_0_0->getNeighbors().contains(interior_0_0));
+	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(interior_0_0));
 	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(exterior_0_1));
 	EXPECT_FALSE(exterior_0_0->getNeighbors().contains(null_0));
 
-	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(interior_0_0));
+	EXPECT_TRUE(exterior_0_1->getNeighbors().contains(interior_0_0));
 	EXPECT_FALSE(exterior_0_1->getNeighbors().contains(exterior_0_0));
 	EXPECT_TRUE(exterior_0_1->getNeighbors().contains(null_0));
 
@@ -234,9 +234,9 @@ TEST(Face_Cuts, Edge_Meeting_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -255,11 +255,11 @@ TEST(Face_Cuts, Edge_Meeting_Cut) {
 			boundary_small_a.append(Pint(4, 2));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -276,8 +276,8 @@ TEST(Face_Cuts, Edge_Meeting_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -326,9 +326,9 @@ TEST(Face_Cuts, Point_Meeting_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -349,11 +349,11 @@ TEST(Face_Cuts, Point_Meeting_Cut) {
 			boundary_small_a.append(Pint(4, 2));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -370,8 +370,8 @@ TEST(Face_Cuts, Point_Meeting_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -416,9 +416,9 @@ TEST(Face_Cuts, Matching_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 
 	//tested operations are performed within this block
@@ -442,11 +442,11 @@ TEST(Face_Cuts, Matching_Cut) {
 			boundary_small_a.append(Pint(4, 2));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 		
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -463,8 +463,8 @@ TEST(Face_Cuts, Matching_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -509,9 +509,9 @@ TEST(Face_Cuts, Before_Overlapping_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 
 	//tested operations are performed within this block
@@ -535,11 +535,11 @@ TEST(Face_Cuts, Before_Overlapping_Cut) {
 			boundary_small_a.append(Pint(4, 1));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 
@@ -557,8 +557,8 @@ TEST(Face_Cuts, Before_Overlapping_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -604,9 +604,9 @@ TEST(Face_Cuts, After_Overlapping_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -629,11 +629,11 @@ TEST(Face_Cuts, After_Overlapping_Cut) {
 			boundary_small_a.append(Pint(3, 4));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -650,8 +650,8 @@ TEST(Face_Cuts, After_Overlapping_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -697,9 +697,9 @@ TEST(Face_Cuts, Overlapping_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	{
 		FLL<Pint> boundary_big;
@@ -721,11 +721,11 @@ TEST(Face_Cuts, Overlapping_Cut) {
 			boundary_small_a.append(Pint(4, 1));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -742,8 +742,8 @@ TEST(Face_Cuts, Overlapping_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -789,9 +789,9 @@ TEST(Face_Cuts, Stacked_Holes) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -817,13 +817,13 @@ TEST(Face_Cuts, Stacked_Holes) {
 			boundary_small_b.append(Pint(2, 4));
 		}
 
-		FLL<Region *> exterior_med;
+		FLL<Region<Pint> *> exterior_med;
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
@@ -843,9 +843,9 @@ TEST(Face_Cuts, Stacked_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -905,9 +905,9 @@ TEST(Face_Cuts, Horshoe_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -930,11 +930,11 @@ TEST(Face_Cuts, Horshoe_Cut) {
 			boundary_small_a.append(Pint(16, -8));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -952,9 +952,9 @@ TEST(Face_Cuts, Horshoe_Cut) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1013,9 +1013,9 @@ TEST(Face_Cuts, Corner_Meeting_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 
@@ -1035,11 +1035,11 @@ TEST(Face_Cuts, Corner_Meeting_Cut) {
 			boundary_small_a.append(Pint(4, 0));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -1056,8 +1056,8 @@ TEST(Face_Cuts, Corner_Meeting_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -1102,9 +1102,9 @@ TEST(Face_Cuts, Edge_Crossing_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -1123,11 +1123,11 @@ TEST(Face_Cuts, Edge_Crossing_Cut) {
 			boundary_small_a.append(Pint(4, 2));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -1144,8 +1144,8 @@ TEST(Face_Cuts, Edge_Crossing_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -1190,9 +1190,9 @@ TEST(Face_Cuts, Corner_Crossing_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -1211,11 +1211,11 @@ TEST(Face_Cuts, Corner_Crossing_Cut) {
 			boundary_small_a.append(Pint(4, -4));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -1232,8 +1232,8 @@ TEST(Face_Cuts, Corner_Crossing_Cut) {
 	ASSERT_NE(interior[0], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -1278,9 +1278,9 @@ TEST(Face_Cuts, Exterior_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -1299,11 +1299,11 @@ TEST(Face_Cuts, Exterior_Cut) {
 			boundary_small_a.append(Pint(-2, 2));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -1325,9 +1325,9 @@ TEST(Face_Cuts, Encapsulating_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -1346,11 +1346,11 @@ TEST(Face_Cuts, Encapsulating_Cut) {
 			boundary_small_a.append(Pint(22, -2));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -1366,7 +1366,7 @@ TEST(Face_Cuts, Encapsulating_Cut) {
 
 	ASSERT_NE(interior[0], nullptr);
 
-	Region * interior_0 = interior[0];
+	Region<Pint> * interior_0 = interior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 
@@ -1400,9 +1400,9 @@ TEST(Face_Cuts, Seperate_Holes) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -1428,13 +1428,13 @@ TEST(Face_Cuts, Seperate_Holes) {
 			boundary_small_b.append(Pint(4, 16));
 		}
 
-		FLL<Region *> exterior_med;
+		FLL<Region<Pint> *> exterior_med;
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
@@ -1454,9 +1454,9 @@ TEST(Face_Cuts, Seperate_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1545,9 +1545,9 @@ TEST(Face_Cuts, Adjacent_Meeting_Holes) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -1573,13 +1573,13 @@ TEST(Face_Cuts, Adjacent_Meeting_Holes) {
 			boundary_small_b.append(Pint(6, 4));
 		}
 
-		FLL<Region *> exterior_med;
+		FLL<Region<Pint> *> exterior_med;
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
@@ -1599,9 +1599,9 @@ TEST(Face_Cuts, Adjacent_Meeting_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1673,9 +1673,9 @@ TEST(Face_Cuts, Adjacent_Crossing_Holes) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -1701,13 +1701,13 @@ TEST(Face_Cuts, Adjacent_Crossing_Holes) {
 			boundary_small_b.append(Pint(6, 4));
 		}
 
-		FLL<Region *> exterior_med;
+		FLL<Region<Pint> *> exterior_med;
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
@@ -1725,9 +1725,9 @@ TEST(Face_Cuts, Adjacent_Crossing_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1799,9 +1799,9 @@ TEST(Face_Cuts, Connecting_Holes) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -1827,13 +1827,13 @@ TEST(Face_Cuts, Connecting_Holes) {
 			boundary_small_b.append(Pint(2, 4));
 		}
 
-		FLL<Region *> exterior_med;
+		FLL<Region<Pint> *> exterior_med;
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
@@ -1853,9 +1853,9 @@ TEST(Face_Cuts, Connecting_Holes) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -1914,9 +1914,9 @@ TEST(Face_Cuts, Connecting_Several_Holes) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -1949,14 +1949,14 @@ TEST(Face_Cuts, Connecting_Several_Holes) {
 			boundary_small_c.append(Pint(16, 5));
 		}
 
-		FLL<Region *> exterior_med_a;
-		FLL<Region *> exterior_med_b;
+		FLL<Region<Pint> *> exterior_med_a;
+		FLL<Region<Pint> *> exterior_med_b;
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior_med_a, interior);
 
@@ -1999,10 +1999,10 @@ TEST(Face_Cuts, Connecting_Several_Holes) {
 	ASSERT_NE(interior[2], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * interior_2 = interior[2];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * interior_2 = interior[2];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -2093,9 +2093,9 @@ TEST(Face_Cuts, Splitting_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -2114,11 +2114,11 @@ TEST(Face_Cuts, Splitting_Cut) {
 			boundary_small_a.append(Pint(20, 5));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -2136,9 +2136,9 @@ TEST(Face_Cuts, Splitting_Cut) {
 	ASSERT_NE(exterior[0], nullptr);
 	ASSERT_NE(exterior[1], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * exterior_0 = exterior[0];
-	Region * exterior_1 = exterior[1];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * exterior_0 = exterior[0];
+	Region<Pint> * exterior_1 = exterior[1];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(exterior_0, nullptr);
@@ -2197,9 +2197,9 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -2225,13 +2225,13 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 			boundary_small_b.append(Pint(16, 8));
 		}
 
-		FLL<Region *> exterior_med;
+		FLL<Region<Pint> *> exterior_med;
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
@@ -2252,10 +2252,10 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 	ASSERT_NE(interior[2], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * interior_2 = interior[2];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * interior_2 = interior[2];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -2346,9 +2346,9 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -2368,11 +2368,11 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 			boundary_small_a.append(Pint(6, -1));
 		}
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior, interior);
 	}
@@ -2390,9 +2390,9 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 	ASSERT_NE(interior[1], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
@@ -2451,9 +2451,9 @@ TEST(Face_Cuts, Divided_Meet_Cut) {
 	DCEL<Pint> space;
 
 	//results
-	FLL<Region *> interior;
-	FLL<Region *> exterior;
-	Region * null;
+	FLL<Region<Pint> *> interior;
+	FLL<Region<Pint> *> exterior;
+	Region<Pint> * null;
 
 	//tested operations are performed within this block
 	{
@@ -2481,13 +2481,13 @@ TEST(Face_Cuts, Divided_Meet_Cut) {
 			boundary_small_b.append(Pint(3, 1));
 		}
 
-		FLL<Region *> exterior_med;
+		FLL<Region<Pint> *> exterior_med;
 
-		Region * product = new Region(&space, boundary_big);
+		auto product = space.region(boundary_big);
 
 		auto null_face = (*product)[0]->getRoot()->getInv()->getFace();
 
-		null = new Region(&space, null_face);
+		null = space.region(null_face);
 
 		subAllocate(product, boundary_small_a, exterior_med, interior);
 
@@ -2508,10 +2508,10 @@ TEST(Face_Cuts, Divided_Meet_Cut) {
 	ASSERT_NE(interior[2], nullptr);
 	ASSERT_NE(exterior[0], nullptr);
 
-	Region * interior_0 = interior[0];
-	Region * interior_1 = interior[1];
-	Region * interior_2 = interior[2];
-	Region * exterior_0 = exterior[0];
+	Region<Pint> * interior_0 = interior[0];
+	Region<Pint> * interior_1 = interior[1];
+	Region<Pint> * interior_2 = interior[2];
+	Region<Pint> * exterior_0 = exterior[0];
 
 	ASSERT_NE(interior_0, nullptr);
 	ASSERT_NE(interior_1, nullptr);
