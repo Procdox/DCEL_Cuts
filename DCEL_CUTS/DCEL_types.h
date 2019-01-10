@@ -585,6 +585,21 @@ public:
 		return target;
 	}
 
+	FLL<Face<_P> *> getNeighbors() {
+		FLL<Face<_P> *> target;
+		Edge<_P> * focus = root;
+
+		do {
+			Face<_P> * canidate = focus->inv->loop;
+			if (!target.contains(canidate)) {
+				target.append(canidate);
+			}
+			focus = focus->next;
+		} while (focus != root);
+
+		return target;
+	}
+
 	//return a list of the faces that share a boundary in the loop
 	FLL<Face<_P> const *> getNeighbors() const {
 		FLL<Face<_P> const *> target;
@@ -725,6 +740,21 @@ public:
 
 	DCEL<_P> * getUni() {
 		return universe;
+	}
+
+	FLL<Region *> getNeighbors() {
+		FLL<Region *> product;
+
+		for (auto border : Boundaries) {
+			auto canidates = border->getNeighbors();
+			for (auto suggest : canidates) {
+				if (!product.contains(suggest->group)) {
+					product.push(suggest->group);
+				}
+			}
+		}
+
+		return product;
 	}
 
 };
