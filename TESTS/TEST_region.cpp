@@ -270,6 +270,7 @@ TEST(Face_Cuts, Edge_Meeting_Cut) {
 	EXPECT_EQ(space.pointCount(), 8);
 	EXPECT_EQ(space.edgeCount(), 18);
 	EXPECT_EQ(space.faceCount(), 3);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -364,6 +365,7 @@ TEST(Face_Cuts, Point_Meeting_Cut) {
 	EXPECT_EQ(space.pointCount(), 9);
 	EXPECT_EQ(space.edgeCount(), 20);
 	EXPECT_EQ(space.faceCount(), 3);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -457,6 +459,7 @@ TEST(Face_Cuts, Matching_Cut) {
 	EXPECT_EQ(space.pointCount(), 10);
 	EXPECT_EQ(space.edgeCount(), 22);
 	EXPECT_EQ(space.faceCount(), 3);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -551,6 +554,7 @@ TEST(Face_Cuts, Before_Overlapping_Cut) {
 	EXPECT_EQ(space.pointCount(), 12);
 	EXPECT_EQ(space.edgeCount(), 26);
 	EXPECT_EQ(space.faceCount(), 3);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -644,6 +648,7 @@ TEST(Face_Cuts, After_Overlapping_Cut) {
 	EXPECT_EQ(space.pointCount(), 12);
 	EXPECT_EQ(space.edgeCount(), 26);
 	EXPECT_EQ(space.faceCount(), 3);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -736,6 +741,7 @@ TEST(Face_Cuts, Overlapping_Cut) {
 	EXPECT_EQ(space.pointCount(), 12);
 	EXPECT_EQ(space.edgeCount(), 26);
 	EXPECT_EQ(space.faceCount(), 3);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -836,6 +842,7 @@ TEST(Face_Cuts, Stacked_Holes) {
 	EXPECT_EQ(space.pointCount(), 12);
 	EXPECT_EQ(space.edgeCount(), 28);
 	EXPECT_EQ(space.faceCount(), 4);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 2);
 	ASSERT_EQ(exterior.size(), 1);
@@ -945,6 +952,7 @@ TEST(Face_Cuts, Horshoe_Cut) {
 	EXPECT_EQ(space.pointCount(), 12);
 	EXPECT_EQ(space.edgeCount(), 28);
 	EXPECT_EQ(space.faceCount(), 4);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 2);
 	ASSERT_EQ(exterior.size(), 1);
@@ -1050,6 +1058,7 @@ TEST(Face_Cuts, Corner_Meeting_Cut) {
 	EXPECT_EQ(space.pointCount(), 7);
 	EXPECT_EQ(space.edgeCount(), 16);
 	EXPECT_EQ(space.faceCount(), 3);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -1138,6 +1147,7 @@ TEST(Face_Cuts, Edge_Crossing_Cut) {
 	EXPECT_EQ(space.pointCount(), 8);
 	EXPECT_EQ(space.edgeCount(), 18);
 	EXPECT_EQ(space.faceCount(), 3);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -1226,6 +1236,7 @@ TEST(Face_Cuts, Corner_Crossing_Cut) {
 	EXPECT_EQ(space.pointCount(), 7);
 	EXPECT_EQ(space.edgeCount(), 16);
 	EXPECT_EQ(space.faceCount(), 3);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 1);
@@ -1314,6 +1325,7 @@ TEST(Face_Cuts, Exterior_Cut) {
 	EXPECT_EQ(space.pointCount(), 4);
 	EXPECT_EQ(space.edgeCount(), 8);
 	EXPECT_EQ(space.faceCount(), 2);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 0);
 	ASSERT_EQ(exterior.size(), 1);
@@ -1361,6 +1373,7 @@ TEST(Face_Cuts, Encapsulating_Cut) {
 	EXPECT_EQ(space.pointCount(), 4);
 	EXPECT_EQ(space.edgeCount(), 8);
 	EXPECT_EQ(space.faceCount(), 2);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 0);
@@ -1447,6 +1460,7 @@ TEST(Face_Cuts, Seperate_Holes) {
 	EXPECT_EQ(space.pointCount(), 12);
 	EXPECT_EQ(space.edgeCount(), 24);
 	EXPECT_EQ(space.faceCount(), 6);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 2);
 	ASSERT_EQ(exterior.size(), 1);
@@ -1592,6 +1606,7 @@ TEST(Face_Cuts, Adjacent_Meeting_Holes) {
 	EXPECT_EQ(space.pointCount(), 12);
 	EXPECT_EQ(space.edgeCount(), 26);
 	EXPECT_EQ(space.faceCount(), 5);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 2);
 	ASSERT_EQ(exterior.size(), 1);
@@ -1718,6 +1733,7 @@ TEST(Face_Cuts, Adjacent_Crossing_Holes) {
 	EXPECT_EQ(space.pointCount(), 12);
 	EXPECT_EQ(space.edgeCount(), 26);
 	EXPECT_EQ(space.faceCount(), 5);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 2);
 	ASSERT_EQ(exterior.size(), 1);
@@ -1846,6 +1862,7 @@ TEST(Face_Cuts, Connecting_Holes) {
 	EXPECT_EQ(space.pointCount(), 12);
 	EXPECT_EQ(space.edgeCount(), 28);
 	EXPECT_EQ(space.faceCount(), 4);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 2);
 	ASSERT_EQ(exterior.size(), 1);
@@ -1968,29 +1985,10 @@ TEST(Face_Cuts, Connecting_Several_Holes) {
 
 	//testing
 
-	/*EXPECT_EQ(exteriorPintrep_a.size(), 1);
-	EXPECT_EQ(interiorPintrep_a.size(), 1);
-	EXPECT_EQ(exteriorPintrep_b.size(), 1);
-	EXPECT_EQ(interiorPintrep_b.size(), 1);
-	EXPECT_EQ(exterior.size(), 1);
-	EXPECT_EQ(interior.size(), 1);
-
-	EXPECT_EQ(exterior[0]->getHoleCount(), 1);
-	EXPECT_EQ(interiorPintrep_a[0]->borderCount(10), 6);
-	EXPECT_EQ(interiorPintrep_b[0]->borderCount(10), 6);
-	EXPECT_EQ(interior[0]->borderCount(10), 4);
-	EXPECT_EQ(exterior[0]->borderCount(20), 4);
-	EXPECT_EQ(exterior[0]->holeBorderCount(0, 20), 12);
-
-	EXPECT_EQ(interiorPintrep_a[0]->getRootEdge()->loopArea(), 32);
-	EXPECT_EQ(interiorPintrep_b[0]->getRootEdge()->loopArea(), 32);
-	EXPECT_EQ(interior[0]->getRootEdge()->loopArea(), 120);
-	EXPECT_EQ(exterior[0]->getRootEdge()->loopArea(), 400);
-	EXPECT_EQ(exterior[0]->getHole(0)->loopArea(), -184);
-	*/
 	EXPECT_EQ(space.pointCount(), 16);
 	EXPECT_EQ(space.edgeCount(), 36);
 	EXPECT_EQ(space.faceCount(), 6);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 3);
 	ASSERT_EQ(exterior.size(), 1);
@@ -2129,6 +2127,7 @@ TEST(Face_Cuts, Splitting_Cut) {
 	EXPECT_EQ(space.pointCount(), 8);
 	EXPECT_EQ(space.edgeCount(), 20);
 	EXPECT_EQ(space.faceCount(), 4);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 1);
 	ASSERT_EQ(exterior.size(), 2);
@@ -2244,6 +2243,7 @@ TEST(Face_Cuts, Divided_Crossing_Holes) {
 	EXPECT_EQ(space.pointCount(), 16);
 	EXPECT_EQ(space.edgeCount(), 36);
 	EXPECT_EQ(space.faceCount(), 6);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 3);
 	ASSERT_EQ(exterior.size(), 1);
@@ -2383,6 +2383,7 @@ TEST(Face_Cuts, Triangles_Crossing_Cut) {
 	EXPECT_EQ(space.pointCount(), 9);
 	EXPECT_EQ(space.edgeCount(), 22);
 	EXPECT_EQ(space.faceCount(), 4);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 2);
 	ASSERT_EQ(exterior.size(), 1);
@@ -2500,6 +2501,7 @@ TEST(Face_Cuts, Divided_Meet_Cut) {
 	EXPECT_EQ(space.pointCount(), 15);
 	EXPECT_EQ(space.edgeCount(), 36);
 	EXPECT_EQ(space.faceCount(), 5);
+	EXPECT_EQ(space.regionCount(), 3);
 
 	ASSERT_EQ(interior.size(), 3);
 	ASSERT_EQ(exterior.size(), 1);
