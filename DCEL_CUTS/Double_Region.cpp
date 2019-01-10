@@ -1,25 +1,28 @@
-#include "Ratio_Region.h"
+#include "Double_Region.h"
+#include <cmath>
+#include <limits>
 
 
-
-FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
-	Edge<Pint> * focus = rel.getRoot();
+//DOUBLE BOOLEAN OPS
+FaceRelation const getPointRelation(Face<Pdbl> & rel, Pdbl const &test_point) {
+	Edge<Pdbl> * focus = rel.getRoot();
 	int count = 0;
 
 	bool is_best = false;
-	rto best_distance = 0;
-	bool inside = Pint::area(rel.getLoopPoints()) < 0;
+	double best_distance = 0;
+	bool inside = Pdbl::area(rel.getLoopPoints()) < 0.0;
 
 	do {
-		const Pint &start_vector = focus->getStart()->getPosition();
-		const Pint &end_vector = focus->getEnd()->getPosition();
+		const Pdbl &start_vector = focus->getStart()->getPosition();
+		const Pdbl &end_vector = focus->getEnd()->getPosition();
 
 		//does it sit on
-		rto y_length = end_vector.Y - start_vector.Y;
-		rto y_offset = test_point.Y - start_vector.Y;
+		double y_length = end_vector.Y - start_vector.Y;
+		double y_offset = test_point.Y - start_vector.Y;
 
-		if (y_length == 0) {
-			if (y_offset == 0) {
+		//absolute comparison fine, we only care about perfectly level edges
+		if (fabs(y_length) < 1.0) {
+			if (fabs(y_offset) < 1.0) {
 				if ((start_vector.X <= test_point.X && test_point.X <= end_vector.X) ||
 					(start_vector.X >= test_point.X && test_point.X >= end_vector.X)) {
 
@@ -30,25 +33,23 @@ FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
 			continue;
 		}
 		else {
-			rto ratio = y_offset / y_length;
+			double ratio = y_offset / y_length;
+			if (ratio <= 1.0 && ratio >= 0.0) {
+				double x_length = end_vector.X - start_vector.X;
 
-			if (ratio <= 1 && ratio >= 0) {
-				rto x_length = end_vector.X - start_vector.X;
+				double x = start_vector.X + x_length * ratio;
+				double distance = test_point.X - x;
 
-				rto x = start_vector.X + x_length * ratio;
-				rto distance = test_point.X - x;
-
-				if (distance == 0) {
+				if (fabs(distance) < 1.0) {
 					return FaceRelation(FaceRelationType::point_on_boundary, focus);
 				}
-				else if (distance > 0 && (distance < best_distance || !is_best)) {
+				else if (distance > 0.0 && (distance < best_distance || !is_best)) {
 					is_best = true;
 					best_distance = distance;
 
-					inside = y_length > 0;
+					inside = y_length > 0.0;
 				}
 			}
-
 		}
 		focus = focus->getNext();
 	} while (focus != rel.getRoot());
@@ -61,20 +62,21 @@ FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
 	}
 }
 
-FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_point) {
+//DOUBLE BOOLEAN OPS
+FaceRelationType const getPointRelation(FLL<Pdbl> const & rel, Pdbl const &test_point) {
 	int count = 0;
 
 	bool is_best = false;
-	rto best_distance = 0;
-	bool inside = Pint::area(rel) < 0;
+	double best_distance = 0;
+	bool inside = Pdbl::area(rel) < 0.0;
 
 	for (auto start = rel.begin(); start != rel.end(); ++start) {
-		Pint start_vector = *start;
-		Pint end_vector = *start.cyclic_next();
+		Pdbl start_vector = *start;
+		Pdbl end_vector = *start.cyclic_next();
 
 		//does it sit on
-		rto y_length = end_vector.Y - start_vector.Y;
-		rto y_offset = test_point.Y - start_vector.Y;
+		double y_length = end_vector.Y - start_vector.Y;
+		double y_offset = test_point.Y - start_vector.Y;
 
 		if (y_length == 0) {
 			if (y_offset == 0) {
@@ -87,17 +89,17 @@ FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_
 			continue;
 		}
 		else{
-			rto ratio = y_offset / y_length;
-			if (ratio <= 1 && ratio >= 0) {
-				rto x_length = end_vector.X - start_vector.X;
+			double ratio = y_offset / y_length;
+			if (ratio <= 1.0 && ratio >= 0.0) {
+				double x_length = end_vector.X - start_vector.X;
 
-				rto x = start_vector.X + x_length * ratio;
-				rto distance = test_point.X - x;
+				double x = start_vector.X + x_length * ratio;
+				double distance = test_point.X - x;
 
-				if (distance == 0) {
+				if (fabs(distance) < 1.0) {
 					return FaceRelationType::point_on_boundary;
 				}
-				else if (distance > 0 && (distance < best_distance || !is_best)) {
+				else if (distance > 0.0 && (distance < best_distance || !is_best)) {
 					is_best = true;
 					best_distance = distance;
 
@@ -115,8 +117,8 @@ FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_
 	}
 }
 
-FaceRelation contains(Region<Pint> * target, Pint const & test_point) {
-	for(auto focus : target->getBounds()) {
+FaceRelation contains(Region<Pdbl> * target, Pdbl const & test_point) {
+	for (auto focus : target->getBounds()) {
 
 		FaceRelation result = getPointRelation(*focus, test_point);
 		if (result.type != FaceRelationType::point_interior) {
@@ -127,16 +129,16 @@ FaceRelation contains(Region<Pint> * target, Pint const & test_point) {
 	return FaceRelation(FaceRelationType::point_interior, nullptr);
 }
 
-bool merge(Region<Pint> * a, Region<Pint> * b) {
+bool merge(Region<Pdbl> * a, Region<Pdbl> * b) {
 	//since both areas are continuous, its trivial that only one or no boundary pair can touch
-	
+
 	//regions are either strictly internal, strictly external, or weakly external to boundaries
 
 	//if a boundary contains any part of a region, it can't touch that region (
-	
-	Face<Pint> * local_face = nullptr;
-	Face<Pint> * target_face = nullptr;
-	for(auto focus_local : a->getBounds()) {
+
+	Face<Pdbl> * local_face = nullptr;
+	Face<Pdbl> * target_face = nullptr;
+	for (auto focus_local : a->getBounds()) {
 
 		auto neighbors = focus_local->getNeighbors();
 
@@ -174,9 +176,9 @@ bool merge(Region<Pint> * a, Region<Pint> * b) {
 
 struct intersect {
 
-	Pint location;
-	Edge<Pint>* mark;
-	rto distance;
+	Pdbl location;
+	Edge<Pdbl>* mark;
+	double distance;
 };
 
 bool intersectSort(intersect *a, intersect *b) {
@@ -184,20 +186,21 @@ bool intersectSort(intersect *a, intersect *b) {
 }
 
 //returns a list of intersects sorted by distance
-FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
-	FLL<Edge<Pint> *> const & canidates) {
+//DOUBLE BOOLEAN OPS
+FLL<intersect *> findIntersects(Pdbl const & start, Pdbl const & stop,
+	FLL<Edge<Pdbl> *> const & canidates) {
 
 	//detect intersect
 	FLL<intersect *> product;
 
-	for(auto target : canidates) {
+	for (auto target : canidates) {
 
-		Pint intersect_location;
+		Pdbl intersect_location;
 
-		Pint test_start = target->getStart()->getPosition();
-		Pint test_stop = target->getEnd()->getPosition();
+		Pdbl test_start = target->getStart()->getPosition();
+		Pdbl test_stop = target->getEnd()->getPosition();
 
-		bool valid = Pint::getIntersect(start, stop, test_start, test_stop, intersect_location);
+		bool valid = Pdbl::getIntersect(start, stop, test_start, test_stop, intersect_location);
 
 		if (valid) {
 			intersect * output = new intersect();
@@ -211,15 +214,15 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 		}
 		else {
 			//parrallel test
-			Pint a = stop - start;
-			Pint b = test_stop - test_start;
+			Pdbl a = stop - start;
+			Pdbl b = test_stop - test_start;
 
-			rto x, y;
+			double x, y;
 			if (a.Y != 0 && b.Y != 0) {
 				x = a.X / a.Y;
 				y = b.X / b.Y;
 			}
-			else if(a.Y == 0 && b.Y == 0){
+			else if (a.Y == 0 && b.Y == 0) {
 				x = a.X / a.X;
 				y = b.X / b.X;
 			}
@@ -227,7 +230,7 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 			if (x == y || x == -y) {
 
 				//create an interesect for the ends of each segment, that lie on the other segment
-				if (Pint::isOnSegment(start, test_start, test_stop)) {
+				if (Pdbl::isOnSegment(start, test_start, test_stop)) {
 					intersect * output = new intersect();
 
 					output->location = start;
@@ -237,7 +240,7 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 					product.qInsert(output, intersectSort);
 				}
 
-				if (Pint::isOnSegment(stop, test_start, test_stop)) {
+				if (Pdbl::isOnSegment(stop, test_start, test_stop)) {
 					intersect * output = new intersect();
 
 					output->location = stop;
@@ -247,7 +250,7 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 					product.qInsert(output, intersectSort);
 				}
 
-				if (Pint::isOnSegment(test_start, start, stop) && test_start != start && test_start != stop) {
+				if (Pdbl::isOnSegment(test_start, start, stop) && test_start != start && test_start != stop) {
 					intersect * output = new intersect();
 
 					output->location = test_start;
@@ -257,7 +260,7 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 					product.qInsert(output, intersectSort);
 				}
 
-				if (Pint::isOnSegment(test_stop, start, stop) && test_stop != start && test_stop != stop) {
+				if (Pdbl::isOnSegment(test_stop, start, stop) && test_stop != start && test_stop != stop) {
 					intersect * output = new intersect();
 
 					output->location = test_stop;
@@ -276,27 +279,27 @@ FLL<intersect *> findIntersects(Pint const & start, Pint const & stop,
 
 //finds interact features for a suballocation, and subidivides region edges where needed
 //returns true if boundary is entirely external
-bool markRegion(Region<Pint> * target, FLL<Pint> const & boundary, FLL<interact *>  & details) {
-	
+bool markRegion(Region<Pdbl> * target, FLL<Pdbl> const & boundary, FLL<interact *>  & details) {
+
 	bool exterior = true;
 
 	{
-		FLL<Edge<Pint> *> canidates;
+		FLL<Edge<Pdbl> *> canidates;
 
-		for(auto canidate_focus : target->getBounds()) {
+		for (auto canidate_focus : target->getBounds()) {
 			auto tba = canidate_focus->getLoopEdges(); //TODO: rvalues
 			canidates.absorb(tba);
 		}
 
 		auto last = boundary.last();
-		for(auto next : boundary) {
+		for (auto next : boundary) {
 			//find and perform on all intersects
 
 			auto intersects = findIntersects(last, next, canidates);
 
 			bool end_collision = false;
 
-			for(auto const & intersect_focus : intersects) {
+			for (auto const & intersect_focus : intersects) {
 
 				auto mark = intersect_focus->mark;
 
@@ -359,7 +362,7 @@ bool markRegion(Region<Pint> * target, FLL<Pint> const & boundary, FLL<interact 
 
 	{
 		auto last = details.last();
-		for(auto next : details) {
+		for (auto next : details) {
 			last->mid = (last->location + next->location) / 2;
 
 			auto result = contains(target, last->mid);
@@ -369,19 +372,19 @@ bool markRegion(Region<Pint> * target, FLL<Pint> const & boundary, FLL<interact 
 			last = next;
 		}
 	}
-	
+
 	return exterior;
 }
 
 //insert strands into target, and determine face inclusions
-void determineInteriors(Region<Pint> * target, FLL<interact *> & details,
-	FLL<Face<Pint> *> & exteriors, FLL<Face<Pint> *> & interiors) {
+void determineInteriors(Region<Pdbl> * target, FLL<interact *> & details,
+	FLL<Face<Pdbl> *> & exteriors, FLL<Face<Pdbl> *> & interiors) {
 
 	exteriors = target->getBounds();
 
 	auto last = details.begin();
 	auto next = last.cyclic_next();
-	
+
 
 	//consider first segment, if entirely internal, we need to create an edge from scratch
 	if (last->type == FaceRelationType::point_interior) {
@@ -422,7 +425,7 @@ void determineInteriors(Region<Pint> * target, FLL<interact *> & details,
 			else if (into->type == FaceRelationType::point_on_boundary) {
 				if (from->mark->getNext() != into->mark) {
 
-					
+
 
 					if (into->mark->getFace() == from->mark->getFace()) {
 						if (from->mid_interior) {
@@ -430,7 +433,7 @@ void determineInteriors(Region<Pint> * target, FLL<interact *> & details,
 
 							auto created = target->getUni()->addEdge(from->mark, into->mark);
 
-							if (getPointRelation(*created->getFace(),into->mid).type != FaceRelationType::point_exterior) {
+							if (getPointRelation(*created->getFace(), into->mid).type != FaceRelationType::point_exterior) {
 								into->mark = created;
 							}
 
@@ -467,8 +470,8 @@ void determineInteriors(Region<Pint> * target, FLL<interact *> & details,
 	}
 }
 
-void subAllocate(Region<Pint> * target, FLL<Pint> const & boundary,
-	FLL<Region<Pint> *> & exteriors, FLL<Region<Pint> *> & interiors) {
+void subAllocate(Region<Pdbl> * target, FLL<Pdbl> const & boundary,
+	FLL<Region<Pdbl> *> & exteriors, FLL<Region<Pdbl> *> & interiors) {
 	//subdivide all edges based on intersects
 	//this means all boundary edges are either
 	//exterior
@@ -480,8 +483,8 @@ void subAllocate(Region<Pint> * target, FLL<Pint> const & boundary,
 
 	bool exterior = markRegion(target, boundary, details);
 
-	FLL<Face<Pint> *> exterior_faces;
-	FLL<Face<Pint> *> interior_faces;
+	FLL<Face<Pdbl> *> exterior_faces;
+	FLL<Face<Pdbl> *> interior_faces;
 
 	if (exterior) {
 
@@ -497,18 +500,18 @@ void subAllocate(Region<Pint> * target, FLL<Pint> const & boundary,
 	else {
 		determineInteriors(target, details, exterior_faces, interior_faces);
 
-	//find regions, place holes
+		//find regions, place holes
 
-	//determine clockwise faces
-	//determine clockwise containment tree
-	//insert counterclockwise containment at deepest symmetric level
+		//determine clockwise faces
+		//determine clockwise containment tree
+		//insert counterclockwise containment at deepest symmetric level
 
-	//determine interior face + exterior face sets with universal containment, create regions out of these
-	//determine exterior face sets with universal containment, create regions out of these\
+		//determine interior face + exterior face sets with universal containment, create regions out of these
+		//determine exterior face sets with universal containment, create regions out of these\
 
-	//for each interior face, create a region, add any symmetricly contained exterior faces to that region
-		for(auto interior_face : interior_faces) {
-			Region<Pint> * novel = target->getUni()->region();
+		//for each interior face, create a region, add any symmetricly contained exterior faces to that region
+		for (auto interior_face : interior_faces) {
+			Region<Pdbl> * novel = target->getUni()->region();
 
 			auto interior_root = interior_face->getRoot()->getStart()->getPosition();
 
@@ -539,7 +542,7 @@ void subAllocate(Region<Pint> * target, FLL<Pint> const & boundary,
 		//for each exterior face, see which faces are symmetric with it and create regions
 
 		for (auto exterior_focus = exterior_faces.begin(); exterior_focus != exterior_faces.end(); ++exterior_focus) {
-			Region<Pint> * novel = target->getUni()->region();
+			Region<Pdbl> * novel = target->getUni()->region();
 
 			auto base_face = *exterior_focus;
 			auto base_root = base_face->getRoot()->getStart()->getPosition();
@@ -570,26 +573,27 @@ void subAllocate(Region<Pint> * target, FLL<Pint> const & boundary,
 	}
 }
 
-void cleanRegion(Region<Pint> * target) {
+//DOUBLE BOOLEAN OPS
+void cleanRegion(Region<Pdbl> * target) {
 	for (auto border : target->getBounds()) {
 		auto og_root = border->getRoot();
 		auto focus = og_root;
 
-		while(true) {
+		while (true) {
 			auto next = focus->getNext();
-			
+
 			// mid point degree is two test
 			if (focus->getInv()->getLast() == next->getInv()) {
 
 				bool parallel = false;
 
 				// parallel test
-				Pint a = focus->getEnd()->getPosition() - focus->getStart()->getPosition();
-				Pint b = next->getEnd()->getPosition() - next->getStart()->getPosition();
+				Pdbl a = focus->getEnd()->getPosition() - focus->getStart()->getPosition();
+				Pdbl b = next->getEnd()->getPosition() - next->getStart()->getPosition();
 
 				if (a.Y != 0 && b.Y != 0) {
-					rto x = a.X / a.Y;
-					rto y = b.X / b.Y;
+					double x = a.X / a.Y;
+					double y = b.X / b.Y;
 					parallel = x == y;
 				}
 				else if (a.Y == 0 && b.Y == 0) {
