@@ -428,7 +428,17 @@ void determineInteriors(Region<Pint> * target, FLL<interact *> & details,
 
 							auto created = target->getUni()->addEdge(from->mark, into->mark);
 
-							if (getPointRelation(*created->getFace(),into->mid).type != FaceRelationType::point_exterior) {
+							//dot(mid-created_end, (next_end-created_end).cw(90) ) > 0 and dot(mid-created_end, (created_start-created_end).ccw(90) )
+							Pint next_vector = created->getNext()->getEnd()->getPosition() - into->location;
+							Pint created_vector = created->getStart()->getPosition() - into->location;
+
+							Pint next_inward(next_vector.Y, -next_vector.X);
+							Pint created_inward(-created_vector.Y, created_vector.X);
+
+							Pint orientation = into->mid - into->location;
+
+							if( orientation.Dot(next_inward) >= 0 && orientation.Dot(created_inward) > 0){
+							//if (getPointRelation(*created->getFace(),into->mid).type != FaceRelationType::point_exterior) {
 								into->mark = created;
 							}
 
