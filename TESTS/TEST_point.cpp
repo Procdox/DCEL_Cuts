@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "..\DCEL_CUTS\DCEL_point.h"
+#include "..\DCEL_CUTS\Ratio_Point.h"
 
 TEST(Point_Tests, on_segment) {
 	Pint p(-200, 300);

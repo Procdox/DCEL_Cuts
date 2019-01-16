@@ -1,5 +1,8 @@
-#include "DCEL_Region.h"
+#include "Ratio_Region.h"
 
+#ifdef using_unreal
+#include "CoreMinimal.h"
+#endif
 
 
 FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
@@ -29,22 +32,24 @@ FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
 			focus = focus->getNext();
 			continue;
 		}
-		else if ((y_offset <= y_length && y_offset >= 0) || y_offset >= y_length && y_offset <= 0) {
-			rto x_length = end_vector.X - start_vector.X;
+		else{
+			rto ratio = y_offset / y_length;
+			if (ratio <= 1 && ratio >= 0) {
+				rto x_length = end_vector.X - start_vector.X;
 
-			rto x = start_vector.X + (x_length * y_offset) / y_length;
-			rto distance = test_point.X - x;
+				rto x = start_vector.X + x_length * ratio;
+				rto distance = test_point.X - x;
 
-			if (distance == 0) {
-				return FaceRelation(FaceRelationType::point_on_boundary, focus);
+				if (distance == 0) {
+					return FaceRelation(FaceRelationType::point_on_boundary, focus);
+				}
+				else if (distance > 0 && (distance < best_distance || !is_best)) {
+					is_best = true;
+					best_distance = distance;
+
+					inside = y_length > 0;
+				}
 			}
-			else if (distance > 0 && (distance < best_distance || !is_best)) {
-				is_best = true;
-				best_distance = distance;
-
-				inside = y_length > 0;
-			}
-
 		}
 		focus = focus->getNext();
 	} while (focus != rel.getRoot());
@@ -82,20 +87,23 @@ FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_
 			}
 			continue;
 		}
-		else if ((y_offset <= y_length && y_offset >= 0) || y_offset >= y_length && y_offset <= 0) {
-			rto x_length = end_vector.X - start_vector.X;
+		else {
+			rto ratio = y_offset / y_length;
+			if (ratio <= 1 && ratio >= 0) {
+				rto x_length = end_vector.X - start_vector.X;
 
-			rto x = start_vector.X + (x_length * y_offset) / y_length;
-			rto distance = test_point.X - x;
+				rto x = start_vector.X + x_length * ratio;
+				rto distance = test_point.X - x;
 
-			if (distance == 0) {
-				return FaceRelationType::point_on_boundary;
-			}
-			else if (distance > 0 && (distance < best_distance || !is_best)) {
-				is_best = true;
-				best_distance = distance;
+				if (distance == 0) {
+					return FaceRelationType::point_on_boundary;
+				}
+				else if (distance > 0 && (distance < best_distance || !is_best)) {
+					is_best = true;
+					best_distance = distance;
 
-				inside = y_length > 0;
+					inside = y_length > 0;
+				}
 			}
 		}
 	}
@@ -353,17 +361,41 @@ bool markRegion(Region<Pint> * target, FLL<Pint> const & boundary, FLL<interact 
 	{
 		auto last = details.last();
 		for(auto next : details) {
-			last->mid = (last->location + next->location) / 2;
+			last->mid_location = (last->location + next->location) / 2;
 
-			auto result = contains(target, last->mid);
+			auto result = contains(target, last->mid_location);
 
-			last->mid_interior = (result.type != FaceRelationType::point_exterior);
+			last->mid_type = result.type;
 
 			last = next;
 		}
 	}
 	
 	return exterior;
+}
+
+//returns if test is between A and B clockwise (right about the origin from A, left about from B)
+bool between(Pint A, Pint B, Pint test) {
+
+	Pint A_inward(A.Y, -A.X);
+	Pint B_inward(-B.Y, B.X);
+
+	rto bounds_relation = A_inward.Dot(B);
+
+	if (bounds_relation > 0) {
+		//the angle between bounds is in (0,180)
+		return A_inward.Dot(test) >= 0 && B_inward.Dot(test) >= 0;
+	}
+	else if (bounds_relation == 0) {
+		//the angle between bounds is 180 or 0, or one bound is length 0
+		//any case other than 180 is due to an error as used for determine interiors
+
+		return A_inward.Dot(test) >= 0;
+	}
+	else {
+		//the angle between bounds is in (180,360)
+		return A_inward.Dot(test) >= 0 || B_inward.Dot(test) >= 0;
+	}
 }
 
 //insert strands into target, and determine face inclusions
@@ -413,31 +445,33 @@ void determineInteriors(Region<Pint> * target, FLL<interact *> & details,
 
 			}
 			else if (into->type == FaceRelationType::point_on_boundary) {
-				if (from->mark->getNext() != into->mark) {
-
-					
-
+				if (from->mid_type == FaceRelationType::point_interior) {
+					//if (from->mark->getNext() != into->mark) {
 					if (into->mark->getFace() == from->mark->getFace()) {
-						if (from->mid_interior) {
-							exteriors.remove(into->mark->getFace());
 
-							auto created = target->getUni()->addEdge(from->mark, into->mark);
+						exteriors.remove(into->mark->getFace());
 
-							if (getPointRelation(*created->getFace(),into->mid).type != FaceRelationType::point_exterior) {
-								into->mark = created;
-							}
+						auto created = target->getUni()->addEdge(from->mark, into->mark);
 
-							if (!interiors.contains(created->getFace())) {
-								interiors.push(created->getFace());
-							}
-							exteriors.push(created->getInv()->getFace());
-						}
+						//dot(mid-created_end, (next_end-created_end).cw(90) ) > 0 and dot(mid-created_end, (created_start-created_end).ccw(90) )
+						Pint next_vector = created->getNext()->getEnd()->getPosition() - into->location;
+						Pint created_vector = created->getStart()->getPosition() - into->location;
+						Pint orientation = into->mid_location - into->location;
+
+						if (between(next_vector, created_vector, orientation))
+							into->mark = created;
+
+						if (!interiors.contains(created->getFace()))
+							interiors.push(created->getFace());
+
+						exteriors.push(created->getInv()->getFace());
 					}
 					else {
 						exteriors.remove(into->mark->getFace());
 
 						into->mark = target->getUni()->addEdge(from->mark, into->mark);
 					}
+					//}
 				}
 			}
 		}
@@ -462,6 +496,21 @@ void determineInteriors(Region<Pint> * target, FLL<interact *> & details,
 
 void subAllocate(Region<Pint> * target, FLL<Pint> const & boundary,
 	FLL<Region<Pint> *> & exteriors, FLL<Region<Pint> *> & interiors) {
+
+#ifdef using_unreal
+	UE_LOG(LogTemp, Warning, TEXT("SA"));
+	UE_LOG(LogTemp, Warning, TEXT("Boundary"));
+	for (auto point : boundary) {
+		UE_LOG(LogTemp, Warning, TEXT("(%f,%f)"),point.X.toFloat(),point.Y.toFloat());
+	}
+
+	for (auto face : target->getBounds()) {
+		UE_LOG(LogTemp, Warning, TEXT("Face"));
+		for (auto point : face->getLoopPoints()) {
+			UE_LOG(LogTemp, Warning, TEXT("(%f,%f)"), point.X.toFloat(), point.Y.toFloat());
+		}
+	}
+#endif
 	//subdivide all edges based on intersects
 	//this means all boundary edges are either
 	//exterior
@@ -475,6 +524,20 @@ void subAllocate(Region<Pint> * target, FLL<Pint> const & boundary,
 
 	FLL<Face<Pint> *> exterior_faces;
 	FLL<Face<Pint> *> interior_faces;
+
+#ifdef using_unreal
+	for (auto detail : details) {
+		if (detail->type == FaceRelationType::point_exterior) {
+			UE_LOG(LogTemp, Warning, TEXT("(%f,%f) : exterior"), detail->location.X.toFloat(), detail->location.Y.toFloat());
+		}else if(detail->type == FaceRelationType::point_interior) {
+			UE_LOG(LogTemp, Warning, TEXT("(%f,%f) : interior"), detail->location.X.toFloat(), detail->location.Y.toFloat());
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("(%f,%f) : bound"), detail->location.X.toFloat(), detail->location.Y.toFloat());
+		}
+
+	}
+#endif
 
 	if (exterior) {
 

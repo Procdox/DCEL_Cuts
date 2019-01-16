@@ -36,6 +36,14 @@ public:
 		FLL_node * focus;
 
 	public:
+		FLL_iterator() {
+			relevant = nullptr;
+			focus = nullptr;
+		}
+		FLL_iterator(FLL_iterator const & target) {
+			relevant = target.relevant;
+			focus = target.focus;
+		}
 		FLL_iterator(FLL * r, FLL_node * v) {
 			relevant = r;
 			focus = v;
@@ -43,7 +51,6 @@ public:
 		FLL_iterator & operator=(FLL_iterator const & target) {
 			relevant = target.relevant;
 			focus = target.focus;
-
 			return *this;
 		}
 
@@ -51,6 +58,9 @@ public:
 			focus = focus->next;
 
 			return *this;
+		}
+		bool operator==(FLL_iterator const & target) const {
+			return focus == target.focus;
 		}
 		bool operator!=(FLL_iterator const & target) const {
 			return focus != target.focus;
@@ -81,6 +91,14 @@ public:
 		FLL_node const * focus;
 
 	public:
+		FLL_iterator_c() {
+			relevant = nullptr;
+			focus = nullptr;
+		}
+		FLL_iterator_c(FLL_iterator_c const &target) {
+			relevant = target.relevant;
+			focus = target.focus;
+		}
 		FLL_iterator_c(FLL const * r, FLL_node const * v) {
 			relevant = r;
 			focus = v;
@@ -95,6 +113,9 @@ public:
 			focus = focus->next;
 
 			return *this;
+		}
+		bool operator==(FLL_iterator_c const & target) const {
+			return focus == target.focus;
 		}
 		bool operator!=(FLL_iterator_c const & target) const {
 			return focus != target.focus;

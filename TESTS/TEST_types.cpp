@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "..\DCEL_CUTS\DCEL_Point.h"
-#include "..\DCEL_CUTS\DCEL_types.h"
+#include "..\DCEL_CUTS\Ratio_Point.h"
+#include "..\DCEL_CUTS\DCEL.h"
 
 TEST(DCEL_Basics, add_edge) {
 	DCEL<Pint> space;
