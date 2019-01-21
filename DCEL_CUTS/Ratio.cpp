@@ -1,5 +1,6 @@
 #include "Ratio.h"
 
+
 int gcd(int a, int b) {
 	if (a == 0)
 		return b;
@@ -71,8 +72,10 @@ rto rto::operator+(int factor) const
 
 rto rto::operator+(const rto & target) const
 {
-	int x = n * target.d + target.n * d;
-	int y = d * target.d;
+	int g = gcd(target.d, d);
+
+	int x = n * (target.d / g) + target.n * (d / g);
+	int y = d * (target.d / g);
 
 	int z = gcd(x, y);
 
@@ -99,8 +102,10 @@ rto rto::operator-(int factor) const
 
 rto rto::operator-(const rto & target) const
 {
-	int x = n * target.d - target.n * d;
-	int y = d * target.d;
+	int g = gcd(target.d, d);
+
+	int x = n * (target.d / g) - target.n * (d / g);
+	int y = d * (target.d / g);
 
 	int z = gcd(x, y);
 
@@ -187,8 +192,10 @@ rto & rto::operator+=(int factor)
 
 rto & rto::operator+=(const rto & target)
 {
-	int x = n * target.d + target.n * d;
-	int y = d * target.d;
+	int g = gcd(target.d, d);
+
+	int x = n * (target.d/g) + target.n * (d/g);
+	int y = d * (target.d/g);
 
 	int z = gcd(x, y);
 
@@ -223,8 +230,10 @@ rto & rto::operator-=(int factor)
 
 rto & rto::operator-=(const rto & target)
 {
-	int x = n * target.d - target.n * d;
-	int y = d * target.d;
+	int g = gcd(target.d, d);
+
+	int x = n * (target.d / g) - target.n * (d / g);
+	int y = d * (target.d / g);
 
 	int z = gcd(x, y);
 

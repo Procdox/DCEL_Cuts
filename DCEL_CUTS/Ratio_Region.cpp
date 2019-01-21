@@ -39,6 +39,7 @@ FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
 
 				rto x = start_vector.X + x_length * ratio;
 				rto distance = test_point.X - x;
+
 				if (distance == 0) {
 					return FaceRelation(FaceRelationType::point_on_boundary, focus);
 				}
@@ -158,16 +159,16 @@ bool merge(Region<Pint> * a, Region<Pint> * b) {
 
 	//we have found a boundary pair that neighbors one another, merge them
 
+	a->remove(local_face);
+	b->remove(target_face);
+
 	auto tba = local_face->mergeWithFace(target_face);
 
-	//now edit the boundary lists of both regions
-	a->remove(local_face);
+	for (auto face : b->getBounds())
+		a->append(face);
 
-	for (auto face : tba) {
-		b->append(face);
-	}
-
-	a->clear();
+	for(auto face : tba)
+		a->append(face);
 
 	return true;
 }
@@ -374,7 +375,7 @@ bool markRegion(Region<Pint> * target, FLL<Pint> const & boundary, FLL<interact 
 }
 
 //returns if test is between A and B clockwise (right about the origin from A, left about from B)
-bool between(Pint A, Pint B, Pint test) {
+bool between(Pint const &A, Pint const &B, Pint const &test) {
 
 	Pint A_inward(A.Y, -A.X);
 	Pint B_inward(-B.Y, B.X);
@@ -663,4 +664,47 @@ void cleanRegion(Region<Pint> * target) {
 			focus = focus->getNext();
 		}
 	}
+}
+
+Region<Pint> * RegionAdd(Region<Pint> * target, Edge<Pint> * A, Edge<Pint> * B) {
+	auto A_face = A->getFace();
+	auto B_face = B->getFace();
+
+
+	Region<Pint> * result = nullptr;
+
+	if (A_face->getGroup() != target || B_face->getGroup() != target)
+		return nullptr;
+
+	if (B_face == A_face) {
+		//we will be splitting the region
+
+		target->getUni()->addEdge(A, B);
+
+		B_face = B->getFace();
+
+		result = target->getUni()->region();
+
+		result->append(B_face);
+
+		FLL<Face<Pint> *> transfers;
+
+		for (auto edge : target->getBounds())
+			if (edge == A_face)
+				continue;
+			else if (getPointRelation(*edge, B_face->getRoot()->getStart()->getPosition()).type == FaceRelationType::point_interior
+				&& getPointRelation(*B_face, edge->getRoot()->getStart()->getPosition()).type == FaceRelationType::point_interior)
+				transfers.append(edge);
+
+		for (auto edge : transfers)
+			result->append(edge);
+	}
+	else {
+		//we will be connecting two boundaries
+		target->remove(B_face);
+
+		target->getUni()->addEdge(A, B);
+	}
+
+	return result;
 }

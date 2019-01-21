@@ -154,14 +154,11 @@
     <ClInclude Include="FLL.h" />
     <ClInclude Include="Ratio_Region.h" />
     <ClInclude Include="DCEL.h" />
-    <ClInclude Include="Ratio_Point.h" />
-    <ClInclude Include="Ratio_Offsets.h" />
     <ClInclude Include="Ratio.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ratio_Region.cpp" />
     <ClCompile Include="Ratio_Point.cpp" />
-    <ClCompile Include="Ratio_Offsets.cpp" />
     <ClCompile Include="Ratio.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

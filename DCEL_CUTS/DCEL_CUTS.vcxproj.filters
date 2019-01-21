@@ -7,21 +7,12 @@
     <ClCompile Include="Ratio_Point.cpp">
       <Filter>private</Filter>
     </ClCompile>
-    <ClCompile Include="Ratio_Offsets.cpp">
-      <Filter>private</Filter>
-    </ClCompile>
     <ClCompile Include="Ratio_Region.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ratio.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="Ratio_Offsets.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="Ratio_Point.h">
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="DCEL.h">

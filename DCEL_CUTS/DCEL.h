@@ -387,6 +387,7 @@ public:
 			inv->root->root = next;
 			next->last = inv->last;
 			inv->last->next = next;
+			loop->root = next;
 		}
 
 		if (last == inv) {
@@ -400,6 +401,7 @@ public:
 			root->root = inv->next;
 			last->next = inv->next;
 			inv->next->last = last;
+			loop->root = last;
 		}
 
 		//we may be connecting or disconnecting two loops
@@ -666,9 +668,9 @@ public:
 		Edge<_P> * focus = root;
 		do {
 
-			if (focus->inv->loop == target) {
-				markToRemove.append(focus);
-			}
+			if (focus->inv->loop == target)
+				if(!markToRemove.contains(focus->inv))
+					markToRemove.append(focus);
 
 			focus = focus->next;
 		} while (focus != root);
@@ -701,6 +703,9 @@ class Region {
 
 	}
 	FLL<Face<_P> *> Boundaries;
+
+	Region(Region<_P> &&) = delete;
+	Region(Region<_P> const &) = delete;
 
 public:
 	FLL<Face<_P> *> const & getBounds() {
@@ -908,6 +913,8 @@ public:
 		return result;
 	}
 	//creates an edge and its inverse connecting after an two edges
+	//if this links two faces, b's is removed
+	//if this splits a face, the novel has b as it's root
 	Edge<_P> * addEdge(Edge<_P> * a, Edge<_P> * b) {
 		Edge<_P> * result = createEdge();
 		Face<_P> * novel = nullptr;
