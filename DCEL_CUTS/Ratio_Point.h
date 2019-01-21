@@ -1,7 +1,7 @@
 #pragma once
 #include "Ratio.h"
 #include "FLL.h"
-
+typedef signed long long int;
 /*
 
 Contains defintion for an integer bound 2d vector.
