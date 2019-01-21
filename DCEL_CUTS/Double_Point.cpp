@@ -89,7 +89,7 @@ Pdbl& Pdbl::operator/=(const Pdbl &target) {
 }
 
 bool Pdbl::operator==(const Pdbl &test) const {
-	bool absolute = (abs(test.X - X) < 1.0) && (abs(test.Y - Y) < 1.0);
+	bool absolute = false; // (abs(test.X - X) < 1.0) && (abs(test.Y - Y) < 1.0);
 	bool relative = (abs(test.X - X) < fmax(test.X, X) * DBL_EPSILON) &&
 		(abs(test.Y - Y) < fmax(test.Y, Y) * DBL_EPSILON);
 	return absolute || relative;
@@ -174,19 +174,16 @@ bool Pdbl::getIntersect(const Pdbl &A_S, const Pdbl &A_E, const Pdbl &B_S, const
 
 	const auto denom = A.X * B.Y - A.Y * B.X;
 
-	if (denom == 0) { //REFACTOR
+	if (fabs(denom) < fabs(denom) * DBL_EPSILON) { //REFACTOR
 		return false;
 	}
 
 	const auto s = (A.X * D.Y - A.Y * D.X) / denom;
 	const auto t = (B.X * D.Y - B.Y * D.X) / denom;
 
-	if (s >= 0.0 && s <= 1.0 && t >= 0.0 && t <= 1.0) {
-		Result = (A * t) + A_S;
-		return true;
-	}
+	Result = (A * t) + A_S;
 
-	return false;
+	return (s >= 0.0 && s <= 1.0 && t >= 0.0 && t <= 1.0);
 }
 
 double Pdbl::area(FLL<Pdbl> const & boundary) {
