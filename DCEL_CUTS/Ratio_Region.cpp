@@ -456,6 +456,17 @@ void determineInteriors(Region<Pint> * target, FLL<interact *> & details,
 
 						exteriors.push(created->getInv()->getFace());
 					}
+					else if (next == details.begin()) {
+						auto relevant = into->mark->getNext()->getInv();
+						exteriors.remove(relevant->getFace());
+
+						auto created = target->getUni()->addEdge(from->mark, relevant);
+
+						if (!interiors.contains(created->getFace()))
+							interiors.push(created->getFace());
+
+						exteriors.push(created->getInv()->getFace());
+					}
 					else {
 						exteriors.remove(into->mark->getFace());
 
