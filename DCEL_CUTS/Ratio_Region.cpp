@@ -41,8 +41,17 @@ FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
 					return FaceRelation(FaceRelationType::point_on_boundary, focus);
 				}
 				else if (distance > 0) {
-
-					inside = !inside;
+					if (ratio == 1) {
+						if (y_offset > 0)
+							inside = !inside;
+					}
+					else if (ratio == 0) {
+						if (y_length < 0)
+							inside = !inside;
+					}
+					else {
+						inside = !inside;
+					}
 				}
 			}
 		}
@@ -91,8 +100,17 @@ FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_
 					return FaceRelationType::point_on_boundary;
 				}
 				else if (distance > 0) {
-
-					inside = !inside;
+					if (ratio == 1) {
+						if (y_offset > 0)
+							inside = !inside;
+					}
+					else if (ratio == 0) {
+						if (y_length < 0)
+							inside = !inside;
+					}
+					else {
+						inside = !inside;
+					}
 				}
 			}
 		}
