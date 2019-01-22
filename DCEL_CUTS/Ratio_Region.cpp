@@ -4,13 +4,10 @@
 #include "CoreMinimal.h"
 #endif
 
-
 FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
-	Edge<Pint> * focus = rel.getRoot();
-	int count = 0;
 
-	bool is_best = false;
-	rto best_distance = 0;
+	Edge<Pint> * focus = rel.getRoot();
+
 	bool inside = Pint::area(rel.getLoopPoints()) < 0;
 
 	do {
@@ -43,11 +40,9 @@ FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
 				if (distance == 0) {
 					return FaceRelation(FaceRelationType::point_on_boundary, focus);
 				}
-				else if (distance > 0 && (distance < best_distance || !is_best)) {
-					is_best = true;
-					best_distance = distance;
+				else if (distance > 0) {
 
-					inside = y_length > 0;
+					inside = !inside;
 				}
 			}
 		}
@@ -63,10 +58,7 @@ FaceRelation const getPointRelation(Face<Pint> & rel, Pint const &test_point) {
 }
 
 FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_point) {
-	int count = 0;
 
-	bool is_best = false;
-	rto best_distance = 0;
 	bool inside = Pint::area(rel) < 0;
 
 	for (auto start = rel.begin(); start != rel.end(); ++start) {
@@ -98,11 +90,9 @@ FaceRelationType const getPointRelation(FLL<Pint> const & rel, Pint const &test_
 				if (distance == 0) {
 					return FaceRelationType::point_on_boundary;
 				}
-				else if (distance > 0 && (distance < best_distance || !is_best)) {
-					is_best = true;
-					best_distance = distance;
+				else if (distance > 0) {
 
-					inside = y_length > 0;
+					inside = !inside;
 				}
 			}
 		}
